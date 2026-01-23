@@ -20,10 +20,19 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
     ];
+
+    /**
+     * Accessor for the `name` attribute for backward compatibility.
+     */
+    public function getNameAttribute(): string
+    {
+        return trim((string) ($this->first_name . ' ' . ($this->last_name ?? '')));
+    }
 
     /**
      * The attributes that should be hidden for serialization.
