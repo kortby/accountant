@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class TaxReturn extends Model
+class TaxReturn extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     protected $fillable = [
         'user_id',
         'tax_year',

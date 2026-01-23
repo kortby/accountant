@@ -184,7 +184,9 @@ const submit = () => {
                                     <div class="space-y-2">
                                         <label class="text-sm font-medium text-slate-700">SSN</label>
                                         <input v-model="form.ssn" type="text" placeholder="XXX-XX-XXXX" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+
                                         <span v-if="form.errors.ssn" class="text-xs text-red-500">{{ form.errors.ssn }}</span>
+                                        <span v-if="!form.errors.ssn" class="text-xs text-gray-500">eg: XXX-XX-XXXX</span>
                                     </div>
                                     <div class="space-y-2">
                                         <label class="text-sm font-medium text-slate-700">Date of Birth</label>
@@ -211,16 +213,16 @@ const submit = () => {
                                     </div>
                                     <div class="space-y-2">
                                         <label class="text-sm font-medium text-slate-700">City</label>
-                                        <input v-model="form.city" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                        <input v-model="form.city" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"/>
                                     </div>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="space-y-2">
                                             <label class="text-sm font-medium text-slate-700">State</label>
-                                            <input v-model="form.state" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                            <input v-model="form.state" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" maxlength="2" />
                                         </div>
                                         <div class="space-y-2">
                                             <label class="text-sm font-medium text-slate-700">Zip Code</label>
-                                            <input v-model="form.zip_code" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                            <input v-model="form.zip_code" type="number" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
                                         </div>
                                     </div>
                                 </div>
