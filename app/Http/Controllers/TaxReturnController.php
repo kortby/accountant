@@ -40,7 +40,7 @@ class TaxReturnController extends Controller
         try {
             DB::beginTransaction();
 
-            // Update or create client profile
+            // 1. Update/Create Profile (Existing logic...)
             $profile = ClientProfile::updateOrCreate(
                 ['user_id' => Auth::id()],
                 [
@@ -56,12 +56,12 @@ class TaxReturnController extends Controller
                 ]
             );
 
-            // Create new tax return
+            // 2. Create Tax Return (Existing logic...)
             $taxReturn = TaxReturn::create([
                 'user_id' => Auth::id(),
                 'tax_year' => $request->tax_year,
                 'status' => 'draft',
-                'total_income' => 0, // Will be updated when documents are processed
+                'total_income' => 0,
                 'taxable_income' => 0,
                 'tax_liability' => 0,
                 'total_deductions' => 0,
@@ -70,46 +70,40 @@ class TaxReturnController extends Controller
                 'refund_amount' => 0,
             ]);
 
-            // Handle dependents
+            // 3. Handle Dependents (Existing logic...)
             if ($request->has('dependents')) {
-                // Delete existing dependents
                 $profile->dependents()->delete();
-
-                // Create new dependents
                 foreach ($request->dependents as $dependentData) {
-                    $dependent = new Dependent($dependentData);
-                    $profile->dependents()->save($dependent);
+                    $profile->dependents()->create($dependentData);
                 }
             }
 
-            // Create income sources placeholders based on income types
+            // 4. Handle Income Sources (Existing logic...)
             foreach ($request->income_types as $type) {
                 $taxReturn->incomeSources()->create([
                     'type' => $type,
                     'source_name' => $this->getIncomeSourceName($type),
-                    'amount' => 0, // Will be updated when documents are uploaded
+                    'amount' => 0,
                 ]);
             }
 
-            // Create initial message for accountant
-            // Message::create([
-            //     'tax_return_id' => $taxReturn->id,
-            //     'sender_id' => Auth::id(),
-            //     'recipient_id' => $this->getAvailableAccountant(), // Implement accountant assignment logic
-            //     'subject' => "New Tax Return Request for {$request->tax_year}",
-            //     'content' => $this->generateInitialMessage($request),
-            //     'category' => 'tax_question',
-            //     'priority' => 'normal',
-            // ]);
+            // --- 5. SPATIE MEDIA UPLOAD LOGIC ---
+            if ($request->hasFile('documents')) {
+                foreach ($request->file('documents') as $file) {
+                    $taxReturn->addMedia($file)
+                              ->toMediaCollection('documents');
+                }
+            }
 
             DB::commit();
 
+            return redirect()->route('dashboard')
+                ->with('flash.banner', 'Tax information and documents submitted successfully.');
 
-            $request->session()->flash('flash.banner', 'Tax information submitted successfully. An accountant will be assigned to your case shortly.');
-            return redirect()->route('dashboard');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'An error occurred while submitting your tax information. Please try again.']);
+            // Log the error for debugging: Log::error($e);
+            return back()->withErrors(['error' => 'An error occurred. Please try again.']);
         }
     }
 

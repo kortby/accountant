@@ -73,7 +73,7 @@
                             </p>
                             <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start gap-3">
                                 <div class="rounded-md shadow">
-                                    <Link v-if="canRegister" href="/register"
+                                    <Link v-if="canRegister" href="/file-taxes"
                                         class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 md:py-4 md:text-lg transition-all">
                                     Get started
                                     </Link>

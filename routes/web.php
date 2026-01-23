@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BlogPostController;
+use App\Http\Controllers\TaxReturnController;
 use App\Http\Controllers\WebController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,6 +22,10 @@ Route::get('/book', function () {
         return Inertia::render('Booking');
     })->name('book');
 
+Route::get('/file-taxes', function () {
+        return Inertia::render('TaxReturnForm');
+    })->middleware(['auth', 'verified'])->name('file-taxes');
+
 
 
 
@@ -28,6 +33,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::get('/tax-returns', [TaxReturnController::class, 'index'])->name('tax-information.index');
+
+    Route::get('/tax-returns/{taxReturn}', [TaxReturnController::class, 'show'])->name('tax-information.show');
+
+    Route::post('/store-tax', [TaxReturnController::class, 'store'])->name('tax-information.store');
 
     Route::get('bookings', function () {
         return Inertia::render('BookingList');

@@ -52,4 +52,10 @@ class TaxReturn extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('documents')
+             ->useDisk('public'); // Or 's3' for production
+    }
 }
