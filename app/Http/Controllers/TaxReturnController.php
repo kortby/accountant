@@ -172,7 +172,7 @@ class TaxReturnController extends Controller
     public function show(TaxReturn $taxReturn)
     {
         return Inertia::render('TaxReturnDetail', [
-            'taxReturn' => $taxReturn->with('user', 'deductions', 'incomeSources', 'Documents')->first(),
+            'taxReturn' => $taxReturn->with('user', 'deductions', 'incomeSources')->first(),
             'clientProfile' => auth()->user()->clientProfile->first(),
         ]);
     }
