@@ -17,10 +17,29 @@ class TaxReturnController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = TaxReturn::where('user_id', auth()->id());
+
+        // 1. Search Logic (by ID or Tax Year)
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhere('tax_year', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. Filter Logic (by Status)
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
         return Inertia::render('TaxReturnIndex', [
-            'taxReturns' => TaxReturn::where('user_id', auth()->id())->get(),
+            'taxReturns' => $query->latest()
+                ->paginate(10)
+                ->withQueryString(), // Keeps search params in pagination links
+            'filters' => $request->only(['search', 'status']), // Pass state back to frontend
         ]);
     }
 
