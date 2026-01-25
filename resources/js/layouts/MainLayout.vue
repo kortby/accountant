@@ -24,22 +24,19 @@ const toggleMobileMenu = () => {
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
                         <Link href="/" class="flex-shrink-0 flex items-center gap-2">
-                            <div class="w-8 h-8 bg-orange-600 rounded-md flex items-center justify-center text-white font-bold">
-                                T
-                            </div>
-                            <span class="font-bold text-xl tracking-tight text-slate-900">TaxesAccountant</span>
+                            <img src="img/logo.svg" alt="TaxesAccountant Logo" class="h-6 w-auto" />
                         </Link>
                         <div class="hidden md:ml-10 md:flex md:space-x-8">
-                            <Link href="/" :class="{'border-orange-500 text-slate-900': $page.url === '/', 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': $page.url !== '/'}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
+                            <Link href="/" :class="{'border-orange-500 text-slate-900': $page.url === '/', 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': $page.url !== '/'}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
                                 Home
                             </Link>
-                            <Link href="/tax-services" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/services'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/services')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
+                            <Link href="/tax-services" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/services'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/services')}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
                                 Services
                             </Link>
-                            <Link href="/about" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/about'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/about')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
+                            <Link href="/about" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/about'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/about')}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
                                 About Us
                             </Link>
-                            <Link href="/contact" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/contact'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/contact')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
+                            <Link href="/contact" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/contact'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/contact')}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
                                 Contact
                             </Link>
                         </div>
@@ -91,10 +88,7 @@ const toggleMobileMenu = () => {
             <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-slate-400">
                     <div class="col-span-1 md:col-span-2">
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-6 h-6 bg-orange-600 rounded flex items-center justify-center text-white text-xs font-bold">T</div>
-                            <span class="font-bold text-white text-lg">TaxesAccountant</span>
-                        </div>
+                        <img src="img/logo-dark.svg" alt="TaxesAccountant Logo" class="h-6 w-auto my-4">
                         <p class="text-sm">Making tax filing simple, secure, and stress-free for everyone.</p>
                     </div>
                     <div>

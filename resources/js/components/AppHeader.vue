@@ -35,7 +35,7 @@ import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-vue-next';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, FileUser } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 type Props = {
@@ -59,19 +59,25 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+
+    {
+        title: 'Clients files',
+        href: '/tax-returns',
+        icon: FileUser,
+    },
+    {
+        title: 'Bookings',
+        href: '/bookings',
+        icon: BookOpen,
+    },
+    {
+        title: 'Availability Slots',
+        href: '/availability',
+        icon: Folder,
+    },
 ];
 
 const rightNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
 ];
 </script>
 

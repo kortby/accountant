@@ -4,6 +4,7 @@
         Link
     } from '@inertiajs/vue3';
     import MainLayout from '@/Layouts/MainLayout.vue';
+    import { onMounted } from 'vue';
 
     defineProps({
         canLogin: Boolean,
@@ -43,6 +44,40 @@
             answer: "Yes! While our platform is digital, our service is human. You can message your assigned tax expert directly through the platform or schedule a video call if you need to discuss complex tax situations.",
         },
     ]
+    
+    const getInitials = (author) => {
+        if (!author) return 'A';
+        if (author.first_name && author.last_name) {
+            return (author.first_name.charAt(0) + author.last_name.charAt(0)).toUpperCase();
+        }
+        if (author.name) {
+            const parts = author.name.split(' ').filter(Boolean);
+            if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+            return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+        }
+        return 'A';
+    }
+
+    onMounted(() => {
+        const els = Array.from(document.querySelectorAll('.scroll-animate'));
+        if (!els.length) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const delay = el.dataset.delay ? parseInt(el.dataset.delay, 10) : 0;
+                    setTimeout(() => el.classList.add('in-view'), delay);
+                    observer.unobserve(el);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        els.forEach((el, idx) => {
+            if (!el.dataset.delay) el.dataset.delay = String(idx * 80);
+            observer.observe(el);
+        });
+    });
 </script>
 
 <template>
@@ -62,17 +97,19 @@
                     <div class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
                         <div class="sm:text-center lg:text-left">
                             <h1
-                                class="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-orange-700 to-orange-400">
+                                class="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-orange-700 to-orange-400 scroll-animate"
+                                data-delay="0">
                                 <span class="block xl:inline">Professional Tax Filing</span>
                                 <span class="block ">Made Easy</span>
                             </h1>
                             <p
-                                class="mt-3 text-base text-slate-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                                class="mt-3 text-base text-slate-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0 scroll-animate"
+                                data-delay="120">
                                 Let our expert accountants handle your taxes while you focus on what matters most.
                                 Secure, efficient, and personalized tax services for individuals and businesses.
                             </p>
                             <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start gap-3">
-                                <div class="rounded-md shadow">
+                                <div class="rounded-md shadow scroll-animate" data-delay="240">
                                     <Link v-if="canRegister" href="/file-taxes"
                                         class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 md:py-4 md:text-lg transition-all">
                                     Get started
@@ -116,7 +153,7 @@
 
                 <div class="mt-10">
                     <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-                        <div class="relative bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+                        <div class="relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 scroll-animate" data-delay="160">
                             <div
                                 class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -129,7 +166,7 @@
                                 Bank-level encryption for all your uploaded tax documents and personal information.
                             </p>
                         </div>
-                        <div class="relative bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+                        <div class="relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 scroll-animate" data-delay="220">
                             <div
                                 class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +179,7 @@
                                 Peace of mind knowing a licensed professional reviews your return before filing.
                             </p>
                         </div>
-                        <div class="relative bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+                        <div class="relative bg-white p-6 rounded-lg shadow-sm border border-slate-100 scroll-animate" data-delay="280">
                             <div
                                 class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,7 +202,8 @@
                 <h2 class="text-3xl font-extrabold text-slate-900 text-center mb-8">Client Success Stories</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div v-for="item in testimonials" :key="item.id"
-                        class="bg-slate-50 p-6 rounded-xl border border-slate-100 shadow-sm">
+                        class="bg-slate-50 p-6 rounded-xl border border-slate-100 shadow-sm scroll-animate"
+                        data-delay="200">
                         <p class="text-slate-600 italic">"{{ item . content }}"</p>
                         <div class="mt-4 flex items-center">
                             <div class="flex-shrink-0">
@@ -197,7 +235,7 @@
                 <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
                     <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
 
-                        <div class="flex flex-col">
+                        <div class="flex flex-col scroll-animate" data-delay="140">
                             <dt class="flex items-center gap-x-3 text-base/7 font-semibold text-white">
                                 <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true"
                                     class="size-5 flex-none text-orange-400">
@@ -218,7 +256,7 @@
                             </dd>
                         </div>
 
-                        <div class="flex flex-col">
+                        <div class="flex flex-col scroll-animate" data-delay="200">
                             <dt class="flex items-center gap-x-3 text-base/7 font-semibold text-white">
                                 <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true"
                                     class="size-5 flex-none text-orange-400">
@@ -240,7 +278,7 @@
                             </dd>
                         </div>
 
-                        <div class="flex flex-col">
+                        <div class="flex flex-col scroll-animate" data-delay="260">
                             <dt class="flex items-center gap-x-3 text-base/7 font-semibold text-white">
                                 <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true"
                                     class="size-5 flex-none text-orange-400">
@@ -273,7 +311,8 @@
                 </h2>
                 <dl class="mt-20 divide-y divide-slate-900/10">
                     <div v-for="faq in faqs" :key="faq.id"
-                        class="py-8 first:pt-0 last:pb-0 lg:grid lg:grid-cols-12 lg:gap-8">
+                        class="py-8 first:pt-0 last:pb-0 lg:grid lg:grid-cols-12 lg:gap-8 scroll-animate"
+                        data-delay="120">
                         <dt class="text-base/7 font-semibold text-slate-900 lg:col-span-5">{{ faq . question }}</dt>
                         <dd class="mt-4 lg:col-span-7 lg:mt-0">
                             <p class="text-base/7 text-slate-600">{{ faq . answer }}</p>
@@ -294,7 +333,8 @@
                 </div>
                 <div class="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
                     <div v-for="post in latestBlogs" :key="post.id"
-                        class="flex flex-col rounded-lg shadow-sm overflow-hidden border border-slate-200 bg-white hover:shadow-md transition-shadow">
+                        class="flex flex-col rounded-lg shadow-sm overflow-hidden border border-slate-200 bg-white hover:shadow-md transition-shadow scroll-animate"
+                        data-delay="140">
                         <div class="flex-shrink-0">
                             <img class="h-48 w-full object-cover" :src="post.imageUrl" :alt="post.title">
                         </div>
@@ -310,8 +350,12 @@
                             </div>
                             <div class="mt-6 flex items-center">
                                 <div class="flex-shrink-0">
-                                    <img class="h-10 w-10 rounded-full" :src="post.author.imageUrl"
-                                        :alt="post.author.name">
+                                    <!-- <div v-if="post.author.imageUrl" class="h-10 w-10 rounded-full overflow-hidden">
+                                        <img class="h-full w-full object-cover" :src="post.author.imageUrl" :alt="post.author.name">
+                                    </div> -->
+                                    <div class="h-10 w-10 rounded-full bg-gradient-to-r from-orange-200 to-orange-100 flex items-center justify-center text-orange-700 font-semibold">
+                                        {{ getInitials(post.author) }}
+                                    </div>
                                 </div>
                                 <div class="ml-3">
                                     <p class="text-sm font-medium text-slate-900">
@@ -330,3 +374,27 @@
 
     </MainLayout>
 </template>
+
+<style scoped>
+/* Base state for animated elements */
+.scroll-animate{
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .65s cubic-bezier(.2,.8,.2,1), transform .65s cubic-bezier(.2,.8,.2,1);
+    will-change: transform, opacity;
+}
+.scroll-animate.in-view{
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Slightly bigger, smoother reveal for hero heading */
+.scroll-animate[data-delay][data-delay="0"]{
+    transition-duration: .8s;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .scroll-animate{ transition: none !important; transform: none !important; opacity: 1 !important; }
+}
+</style>
