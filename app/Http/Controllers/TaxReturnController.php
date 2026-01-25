@@ -171,9 +171,14 @@ class TaxReturnController extends Controller
      */
     public function show(TaxReturn $taxReturn)
     {
+        // 1. Use load() to eager load relationships on the existing model instance
+        // 2. Use 'media' (standard Spatie relationship), not 'Documents'
+        $taxReturn->load(['user', 'deductions', 'incomeSources', 'media']);
+
         return Inertia::render('TaxReturnDetail', [
-            'taxReturn' => $taxReturn->with('user', 'deductions', 'incomeSources')->first(),
-            'clientProfile' => auth()->user()->clientProfile->first(),
+            'taxReturn' => $taxReturn,
+            // Ensure you load dependents if they aren't already loaded on the user
+            'clientProfile' => auth()->user()->clientProfile()->with('dependents')->first(),
         ]);
     }
 

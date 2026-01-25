@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {
   Card,
@@ -11,11 +11,20 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { ref, computed } from 'vue';
 
 // Props
 const props = defineProps({
     taxReturn: Object,
     clientProfile: Object,
+});
+
+const page = usePage();
+const currentUser = page.props.auth?.user || null;
+const showSSN = ref(false);
+const canViewSSN = computed(() => {
+    const role = currentUser?.role;
+    return role === 'accountant' || role === 'admin';
 });
 
 // --- Formatting Helpers ---
@@ -165,8 +174,18 @@ const getIncomeLabel = (type) => {
                                 </div>
                                 <Separator />
                                 <div>
-                                    <div class="text-sm font-medium text-gray-500">SSN</div>
-                                    <div class="font-mono text-sm">***-**-{{ clientProfile?.social_security_number?.slice(-4) || '****' }}</div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-medium text-gray-500">SSN</div>
+                                        <div v-if="canViewSSN">
+                                            <Button size="sm" variant="outline" @click="showSSN = !showSSN">
+                                                {{ showSSN ? 'Hide' : 'Show' }} SSN
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div class="font-mono text-sm">
+                                        <span v-if="showSSN">{{ clientProfile?.social_security_number || 'N/A' }}</span>
+                                        <span v-else>***-**-{{ clientProfile?.social_security_number?.slice(-4) || '****' }}</span>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -180,13 +199,30 @@ const getIncomeLabel = (type) => {
                             </CardHeader>
                             <CardContent>
                                 <div v-if="clientProfile?.dependents && clientProfile.dependents.length > 0" class="space-y-4">
-                                    <div v-for="(dep, index) in clientProfile.dependents" :key="index" class="flex justify-between items-center text-sm">
-                                        <div>
-                                            <div class="font-medium">{{ dep.first_name }} {{ dep.last_name }}</div>
-                                            <div class="text-xs text-gray-500 capitalize">{{ dep.relationship }}</div>
+                                    <div v-for="(dep, index) in clientProfile.dependents" :key="index" class="text-sm">
+                                        <div class="flex justify-between items-center ">
+                                            <div>
+                                                <div class="font-medium">{{ dep.first_name }} {{ dep.last_name }}</div>
+                                                <div class="text-xs text-gray-500 capitalize">{{ dep.relationship }}</div>
+                                                <div class="text-xs text-gray-500 capitalize">{{ dep.social_security_number }}</div>
+                                            </div>
+                                            <div class="text-gray-500 text-xs">
+                                                {{ formatDate(dep.date_of_birth) }}
+                                            </div>
                                         </div>
-                                        <div class="text-gray-500 text-xs">
-                                            {{ formatDate(dep.date_of_birth) }}
+                                        <div class="mt-4 border-t-2 pt-4">
+                                            <div class="flex items-center justify-between">
+                                                <div class="text-sm font-medium text-gray-500">SSN</div>
+                                                <div v-if="canViewSSN">
+                                                    <Button size="sm" variant="outline" @click="showSSN = !showSSN">
+                                                        {{ showSSN ? 'Hide' : 'Show' }} SSN
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <div class="font-mono text-sm">
+                                                <span v-if="showSSN">{{ clientProfile?.social_security_number || 'N/A' }}</span>
+                                                <span v-else>***-**-{{ clientProfile?.social_security_number?.slice(-4) || '****' }}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
