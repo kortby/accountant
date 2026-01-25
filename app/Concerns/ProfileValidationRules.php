@@ -18,6 +18,7 @@ trait ProfileValidationRules
             'first_name' => $this->nameRules(),
             'last_name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
+            'phone' => ['nullable', 'regex:/^\+?[0-9\s\-\(\)]+$/'],
         ];
     }
 

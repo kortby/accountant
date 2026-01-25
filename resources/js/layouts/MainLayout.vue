@@ -54,7 +54,7 @@ const toggleMobileMenu = () => {
                                 <Link href="/login" class="text-sm font-medium text-slate-700 hover:text-orange-600">
                                     Log in
                                 </Link>
-                                <Link v-if="canRegister" :href="route('register')" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-orange-600 text-white hover:bg-orange-700 h-9 px-4 py-2 shadow">
+                                <Link v-if="canRegister" href="/register" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-orange-600 text-white hover:bg-orange-700 h-9 px-4 py-2 shadow">
                                     Get Started
                                 </Link>
                             </template>
