@@ -197,30 +197,6 @@
             </div>
         </div>
 
-        <section v-if="testimonials && testimonials.length" class="py-12 bg-white border-t border-slate-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-extrabold text-slate-900 text-center mb-8">Client Success Stories</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div v-for="item in testimonials" :key="item.id"
-                        class="bg-slate-50 p-6 rounded-xl border border-slate-100 shadow-sm scroll-animate"
-                        data-delay="200">
-                        <p class="text-slate-600 italic">"{{ item . content }}"</p>
-                        <div class="mt-4 flex items-center">
-                            <div class="flex-shrink-0">
-                                <div
-                                    class="h-10 w-10 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold">
-                                    {{ item . user ? item . user . name . charAt(0) : 'C' }}
-                                </div>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-slate-900">
-                                    {{ item . user ? item . user . name : 'Client' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <div class="bg-gray-900 py-24 sm:py-32">
             <div class="mx-auto max-w-7xl px-6 lg:px-8">
@@ -365,6 +341,31 @@
                                         <time :datetime="post.datetime">{{ post . date }}</time>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section v-if="testimonials && testimonials.length" class="py-12 bg-white border-t border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-slate-900 text-center mb-8">Client Success Stories</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div v-for="item in testimonials" :key="item.id"
+                        class="bg-slate-50 p-6 rounded-xl border border-slate-100 shadow-sm scroll-animate"
+                        data-delay="200">
+                        <p class="text-slate-600 italic">"{{ item . content }}"</p>
+                        <div class="mt-4 flex items-center">
+                            <div class="flex-shrink-0">
+                                <div
+                                    class="h-10 w-10 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold">
+                                    {{ item . user ? item  . author_name . charAt(0) : 'C' }}
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-slate-900">
+                                    {{ item . user ? item  . author_name : 'Client' }}</p>
                             </div>
                         </div>
                     </div>

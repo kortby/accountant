@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\TaxReturnController;
+use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\WebController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,6 +46,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tax-returns/{taxReturn}', [TaxReturnController::class, 'show'])->name('tax-information.show');
 
     Route::post('/store-tax', [TaxReturnController::class, 'store'])->name('tax-information.store');
+
+    // Testimonial routes
+    Route::get('/testimonials/create', [TestimonialController::class, 'create'])->name('testimonials.create');
+    Route::post('/testimonials', [TestimonialController::class, 'store'])->name('testimonials.store');
 
     // Accountant-only routes
     Route::middleware('role:accountant,admin')->group(function () {
