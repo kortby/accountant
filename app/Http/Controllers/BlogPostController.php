@@ -203,12 +203,10 @@ class BlogPostController extends Controller
      */
     public function create()
     {
-        // $this->authorize('create', BlogPost::class);
-
-        // return Inertia::render('Blog/Create', [
-        //     'categories' => BlogCategory::select('id', 'name')->get(),
-        //     'tags' => BlogTag::select('id', 'name')->get(),
-        // ]);
+        return Inertia::render('Blog/Create', [
+            'categories' => BlogCategory::select('id', 'name')->get(),
+            'tags' => BlogTag::select('id', 'name')->get(),
+        ]);
     }
 
     /**
@@ -216,8 +214,6 @@ class BlogPostController extends Controller
      */
     public function store(Request $request)
     {
-        // $this->authorize('create', BlogPost::class);
-
         $validated = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
@@ -232,10 +228,18 @@ class BlogPostController extends Controller
         $post = new BlogPost($validated);
         $post->user_id = Auth::id();
         $post->slug = Str::slug($request->title);
+        
+        // Calculate reading time (average 200 words per minute)
+        $wordCount = str_word_count(strip_tags($request->content));
+        $post->reading_time = max(1, ceil($wordCount / 200));
 
         if ($request->hasFile('featured_image')) {
             $path = $request->file('featured_image')->store('blog', 'public');
-            $post->featured_image = Storage::url($path);
+            $post->featured_image = $path;
+        }
+        
+        if ($validated['status'] === 'published' && !$post->published_at) {
+            $post->published_at = now();
         }
 
         $post->save();

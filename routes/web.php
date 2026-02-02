@@ -15,6 +15,15 @@ Route::post('/message', [WebController::class, 'storeMessage'])->name('store-mes
 Route::get('/blog/{blogPost}', [BlogPostController::class, 'show'])->name('blog.show');
 Route::get('/blog/category/{blogPost}', [BlogPostController::class, 'category'])->name('blog.category');
 
+// Blog management routes (authenticated)
+Route::middleware(['auth', 'verified', 'role:accountant,admin'])->group(function () {
+    Route::get('/blogs/create', [BlogPostController::class, 'create'])->name('blogs.create');
+    Route::post('/blogs', [BlogPostController::class, 'store'])->name('blogs.store');
+    Route::get('/blogs/{post}/edit', [BlogPostController::class, 'edit'])->name('blogs.edit');
+    Route::put('/blogs/{post}', [BlogPostController::class, 'update'])->name('blogs.update');
+    Route::delete('/blogs/{post}', [BlogPostController::class, 'destroy'])->name('blogs.destroy');
+});
+
 Route::get('/book', function () {
     return Inertia::render('Booking');
 })->name('book');
