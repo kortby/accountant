@@ -87,23 +87,47 @@ const toggleMobileMenu = () => {
         <footer class="bg-slate-900 mt-auto">
             <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-slate-400">
-                    <div class="col-span-1 md:col-span-2">
+                    <div class="col-span-1 md:col-span-1">
                         <img src="img/logo-dark.svg" alt="TaxesAccountant Logo" class="h-6 w-auto my-4">
                         <p class="text-sm">Making tax filing simple, secure, and stress-free for everyone.</p>
                     </div>
                     <div>
+                        <h3 class="text-sm font-semibold text-slate-200 tracking-wider uppercase">Contact</h3>
+                        <ul class="mt-4 space-y-2 text-sm">
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span>4446 Manhattan Beach blvd<br />Lawndale, CA 90260</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                </svg>
+                                <a href="tel:+13108488598" class="hover:text-white">+1 (310) 848-8598</a>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <a href="mailto:support@taxesaccountant.co" class="hover:text-white">support@taxesaccountant.co</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
                         <h3 class="text-sm font-semibold text-slate-200 tracking-wider uppercase">Services</h3>
                         <ul class="mt-4 space-y-4">
-                            <li><Link  href="/tax.services" class="text-base hover:text-white">Personal Taxes</Link></li>
-                            <li><Link  href="/tax.services" class="text-base hover:text-white">Business Taxes</Link></li>
-                            <li><Link  href="/tax.services" class="text-base hover:text-white">Audit Defense</Link></li>
+                            <li><Link  href="/tax-services" class="text-base hover:text-white">Personal Taxes</Link></li>
+                            <li><Link  href="/tax-services" class="text-base hover:text-white">Business Taxes</Link></li>
+                            <li><Link  href="/tax-services" class="text-base hover:text-white">Audit Defense</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h3 class="text-sm font-semibold text-slate-200 tracking-wider uppercase">Company</h3>
                         <ul class="mt-4 space-y-4">
-                            <li><Link href="/about"lass="text-base hover:text-white">About</Link></li>
-                            <li><Link href="/contact"lass="text-base hover:text-white">Contact</Link></li>
+                            <li><Link href="/about" class="text-base hover:text-white">About</Link></li>
+                            <li><Link href="/contact" class="text-base hover:text-white">Contact</Link></li>
                             <li><Link href="#" class="text-base hover:text-white">Privacy Policy</Link></li>
                         </ul>
                     </div>

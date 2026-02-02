@@ -248,7 +248,7 @@ class BlogPostController extends Controller
             $post->tags()->attach($request->tags);
         }
 
-        return redirect()->route('blog.show', $post->slug)
+        return redirect()->route('dashboard', $post->slug)
             ->with('success', 'Blog post created successfully.');
     }
 
