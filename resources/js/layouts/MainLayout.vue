@@ -24,7 +24,7 @@ const toggleMobileMenu = () => {
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
                         <Link href="/" class="flex-shrink-0 flex items-center gap-2">
-                            <img src="/img/logo.svg" alt="TaxesAccountant Logo" class="h-6 w-auto" />
+                            <img src="/img/ta-logo.svg" alt="TaxesAccountant Logo" class="h-12 w-auto" />
                         </Link>
                         <div class="hidden md:ml-10 md:flex md:space-x-8">
                             <Link href="/" :class="{'border-orange-500 text-slate-900': $page.url === '/', 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': $page.url !== '/'}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
@@ -88,7 +88,7 @@ const toggleMobileMenu = () => {
             <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-slate-400">
                     <div class="col-span-1 md:col-span-1">
-                        <img src="/img/logo-dark.svg" alt="TaxesAccountant Logo" class="h-6 w-auto my-4">
+                        <img src="/img/ta-logo-dark.svg" alt="TaxesAccountant Logo" class="h-12 w-auto my-4">
                         <p class="text-sm">Making tax filing simple, secure, and stress-free for everyone.</p>
                     </div>
                     <div>
