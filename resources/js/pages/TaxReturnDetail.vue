@@ -143,6 +143,16 @@ const getIncomeLabel = (type) => {
         </template>
 
         <div class="py-12">
+            <div class="flex justify-between items-center max-w-7xl mx-auto sm:px-6 lg:px-8 mb-6">
+                <div>
+                    <h1 class="text-4xl font-bold">{{ taxReturn.tax_year }} - {{ clientProfile?.user?.first_name }} {{ clientProfile?.user?.last_name }}</h1>
+                </div>
+                <Button>
+                    <a :href="'/tax-returns/' + taxReturn.id + '/edit'" >
+                                                Edit
+                                            </a>
+                </Button>
+            </div>
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

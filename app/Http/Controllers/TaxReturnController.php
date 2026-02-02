@@ -241,7 +241,7 @@ class TaxReturnController extends Controller
 
         // Load client profile based on the tax return's user, not auth user
         $clientProfile = ClientProfile::where('user_id', $taxReturn->user_id)
-            ->with('dependents')
+            ->with(['dependents', 'user'])
             ->first();
 
         return Inertia::render('TaxReturnDetail', [

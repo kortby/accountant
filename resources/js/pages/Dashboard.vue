@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import {
     Card,
@@ -12,6 +12,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { dashboard } from '@/routes'; // Assuming this exists based on your snippet
 import { type BreadcrumbItem } from '@/types';
+
+// Get auth user
+const page = usePage();
+const authUser = page.props.auth?.user;
+const isAccountant = authUser?.role === 'accountant' || authUser?.role === 'admin';
 
 // Breadcrumbs setup
 const breadcrumbs: BreadcrumbItem[] = [
@@ -38,11 +43,8 @@ const hasTestimonials = computed(() => {
 });
 
 import { computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
 
-// Get auth user
-const page = usePage();
-const authUser = page.props.auth?.user;
+// Get auth user (already declared above)
 const isAdmin = authUser?.role === 'admin';
 </script>
 
@@ -110,7 +112,13 @@ const isAdmin = authUser?.role === 'admin';
                     </CardContent>
                     <CardFooter>
                         <Button as-child variant="ghost" class="group text-amber-700 dark:text-amber-400 hover:text-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/30 p-0 hover:px-2 transition-all">
-                            <Link href="/file-taxes">
+                            <Link v-if="isAccountant" href="/file-taxes-for-client">
+                                Start filing now
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.79a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
+                                </svg>
+                            </Link>
+                            <Link v-else href="/file-taxes">
                                 Start filing now
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1">
                                     <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.79a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
@@ -176,35 +184,7 @@ const isAdmin = authUser?.role === 'admin';
                     </CardFooter>
                 </Card>
 
-                <Card class="hover:shadow-md transition-shadow duration-200 dark:border-zinc-800">
-                    <CardHeader>
-                        <CardTitle class="flex items-center gap-3 text-xl text-amber-600 dark:text-amber-500">
-                            <div class="p-2 bg-amber-100 dark:bg-amber-900/20 rounded-lg">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                                </svg>
-                            </div>
-                            Upload Documents
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p class="text-sm text-muted-foreground leading-relaxed">
-                            Securely upload receipts, financial statements, and previous returns. All files are encrypted and stored safely.
-                        </p>
-                    </CardContent>
-                    <CardFooter>
-                        <Button as-child variant="ghost" class="group text-amber-700 dark:text-amber-400 hover:text-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/30 p-0 hover:px-2 transition-all">
-                            <Link href="/file-taxes">
-                                Upload files
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1">
-                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.79a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
-                                </svg>
-                            </Link>
-                        </Button>
-                    </CardFooter>
-                </Card>
-
-                <Card v-if="!hasTestimonials" class="md:col-span-2 border-dashed bg-muted/30 hover:bg-muted/50 transition-colors">
+                <Card class="md:col-span-2 border-dashed bg-muted/30 hover:bg-muted/50 transition-colors">
                     <div class="flex flex-col md:flex-row items-center p-6 gap-6">
                         <div class="p-3 bg-amber-100 dark:bg-amber-900/20 rounded-full">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 text-amber-600 dark:text-amber-500">
