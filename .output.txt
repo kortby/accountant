@@ -1,0 +1,245 @@
+app/Http/Controllers:
+AvailabilityController.php  DeductionController.php
+BlogCategoryController.php  DependentController.php
+BlogCommentController.php   IncomeSourceController.php
+BlogPostController.php      MessageController.php
+BlogRevisionController.php  ServiceController.php
+BlogTagController.php       Settings
+BookingController.php       TaxReturnController.php
+ClientProfileController.php TestimonialController.php
+Controller.php              WebController.php
+app/Http/Controllers/Settings:
+PasswordController.php                TwoFactorAuthenticationController.php
+ProfileController.php
+resources/js:
+actions     components  layouts     pages       ssr.ts      wayfinder
+app.ts      composables lib         routes      types
+resources/js/actions:
+App        Illuminate Laravel
+resources/js/actions/App:
+Http     index.ts
+resources/js/actions/App/Http:
+Controllers index.ts
+resources/js/actions/App/Http/Controllers:
+AvailabilityController.ts Settings                  index.ts
+BlogPostController.ts     TaxReturnController.ts
+BookingController.ts      WebController.ts
+resources/js/actions/App/Http/Controllers/Settings:
+PasswordController.ts                TwoFactorAuthenticationController.ts
+ProfileController.ts                 index.ts
+resources/js/actions/Illuminate:
+Routing  index.ts
+resources/js/actions/Illuminate/Routing:
+RedirectController.ts index.ts
+resources/js/actions/Laravel:
+Fortify  Sanctum  index.ts
+resources/js/actions/Laravel/Fortify:
+Http     index.ts
+resources/js/actions/Laravel/Fortify/Http:
+Controllers index.ts
+resources/js/actions/Laravel/Fortify/Http/Controllers:
+AuthenticatedSessionController.ts
+ConfirmablePasswordController.ts
+ConfirmedPasswordStatusController.ts
+ConfirmedTwoFactorAuthenticationController.ts
+EmailVerificationNotificationController.ts
+EmailVerificationPromptController.ts
+NewPasswordController.ts
+PasswordResetLinkController.ts
+RecoveryCodeController.ts
+RegisteredUserController.ts
+TwoFactorAuthenticatedSessionController.ts
+TwoFactorAuthenticationController.ts
+TwoFactorQrCodeController.ts
+TwoFactorSecretKeyController.ts
+VerifyEmailController.ts
+index.ts
+resources/js/actions/Laravel/Sanctum:
+Http     index.ts
+resources/js/actions/Laravel/Sanctum/Http:
+Controllers index.ts
+resources/js/actions/Laravel/Sanctum/Http/Controllers:
+CsrfCookieController.ts index.ts
+resources/js/components:
+AlertError.vue             InputError.vue
+AppContent.vue             NavFooter.vue
+AppHeader.vue              NavMain.vue
+AppLogo.vue                NavUser.vue
+AppLogoIcon.vue            PlaceholderPattern.vue
+AppShell.vue               TextLink.vue
+AppSidebar.vue             TwoFactorRecoveryCodes.vue
+AppSidebarHeader.vue       TwoFactorSetupModal.vue
+AppearanceTabs.vue         UserInfo.vue
+Breadcrumbs.vue            UserMenuContent.vue
+DeleteUser.vue             ui
+Heading.vue
+resources/js/components/ui:
+alert           card            input           pagination      skeleton
+avatar          checkbox        input-otp       select          spinner
+badge           collapsible     item            separator       table
+breadcrumb      dialog          label           sheet           textarea
+button          dropdown-menu   navigation-menu sidebar         tooltip
+resources/js/components/ui/alert:
+Alert.vue            AlertTitle.vue
+AlertDescription.vue index.ts
+resources/js/components/ui/avatar:
+Avatar.vue         AvatarFallback.vue AvatarImage.vue    index.ts
+resources/js/components/ui/badge:
+Badge.vue index.ts
+resources/js/components/ui/breadcrumb:
+Breadcrumb.vue          BreadcrumbLink.vue      BreadcrumbSeparator.vue
+BreadcrumbEllipsis.vue  BreadcrumbList.vue      index.ts
+BreadcrumbItem.vue      BreadcrumbPage.vue
+resources/js/components/ui/button:
+Button.vue index.ts
+resources/js/components/ui/card:
+Card.vue            CardContent.vue     CardFooter.vue      CardTitle.vue
+CardAction.vue      CardDescription.vue CardHeader.vue      index.ts
+resources/js/components/ui/checkbox:
+Checkbox.vue index.ts
+resources/js/components/ui/collapsible:
+Collapsible.vue        CollapsibleTrigger.vue
+CollapsibleContent.vue index.ts
+resources/js/components/ui/dialog:
+Dialog.vue              DialogFooter.vue        DialogTitle.vue
+DialogClose.vue         DialogHeader.vue        DialogTrigger.vue
+DialogContent.vue       DialogOverlay.vue       index.ts
+DialogDescription.vue   DialogScrollContent.vue
+resources/js/components/ui/dropdown-menu:
+DropdownMenu.vue             DropdownMenuSeparator.vue
+DropdownMenuCheckboxItem.vue DropdownMenuShortcut.vue
+DropdownMenuContent.vue      DropdownMenuSub.vue
+DropdownMenuGroup.vue        DropdownMenuSubContent.vue
+DropdownMenuItem.vue         DropdownMenuSubTrigger.vue
+DropdownMenuLabel.vue        DropdownMenuTrigger.vue
+DropdownMenuRadioGroup.vue   index.ts
+DropdownMenuRadioItem.vue
+resources/js/components/ui/input:
+Input.vue index.ts
+resources/js/components/ui/input-otp:
+InputOTP.vue          InputOTPSeparator.vue index.ts
+InputOTPGroup.vue     InputOTPSlot.vue
+resources/js/components/ui/item:
+Item.vue            ItemDescription.vue ItemHeader.vue      ItemTitle.vue
+ItemActions.vue     ItemFooter.vue      ItemMedia.vue       index.ts
+ItemContent.vue     ItemGroup.vue       ItemSeparator.vue
+resources/js/components/ui/label:
+Label.vue index.ts
+resources/js/components/ui/navigation-menu:
+NavigationMenu.vue          NavigationMenuList.vue
+NavigationMenuContent.vue   NavigationMenuTrigger.vue
+NavigationMenuIndicator.vue NavigationMenuViewport.vue
+NavigationMenuItem.vue      index.ts
+NavigationMenuLink.vue
+resources/js/components/ui/pagination:
+Pagination.vue         PaginationFirst.vue    PaginationNext.vue
+PaginationContent.vue  PaginationItem.vue     PaginationPrevious.vue
+PaginationEllipsis.vue PaginationLast.vue     index.ts
+resources/js/components/ui/select:
+Select.vue                 SelectScrollDownButton.vue
+SelectContent.vue          SelectScrollUpButton.vue
+SelectGroup.vue            SelectSeparator.vue
+SelectItem.vue             SelectTrigger.vue
+SelectItemText.vue         SelectValue.vue
+SelectLabel.vue            index.ts
+resources/js/components/ui/separator:
+Separator.vue index.ts
+resources/js/components/ui/sheet:
+Sheet.vue            SheetFooter.vue      SheetTrigger.vue
+SheetClose.vue       SheetHeader.vue      index.ts
+SheetContent.vue     SheetOverlay.vue
+SheetDescription.vue SheetTitle.vue
+resources/js/components/ui/sidebar:
+Sidebar.vue                SidebarMenuButton.vue
+SidebarContent.vue         SidebarMenuButtonChild.vue
+SidebarFooter.vue          SidebarMenuItem.vue
+SidebarGroup.vue           SidebarMenuSkeleton.vue
+SidebarGroupAction.vue     SidebarMenuSub.vue
+SidebarGroupContent.vue    SidebarMenuSubButton.vue
+SidebarGroupLabel.vue      SidebarMenuSubItem.vue
+SidebarHeader.vue          SidebarProvider.vue
+SidebarInput.vue           SidebarRail.vue
+SidebarInset.vue           SidebarSeparator.vue
+SidebarMenu.vue            SidebarTrigger.vue
+SidebarMenuAction.vue      index.ts
+SidebarMenuBadge.vue       utils.ts
+resources/js/components/ui/skeleton:
+Skeleton.vue index.ts
+resources/js/components/ui/spinner:
+Spinner.vue index.ts
+resources/js/components/ui/table:
+Table.vue        TableCell.vue    TableHead.vue    index.ts
+TableBody.vue    TableEmpty.vue   TableHeader.vue  utils.ts
+TableCaption.vue TableFooter.vue  TableRow.vue
+resources/js/components/ui/textarea:
+Textarea.vue index.ts
+resources/js/components/ui/tooltip:
+Tooltip.vue         TooltipProvider.vue index.ts
+TooltipContent.vue  TooltipTrigger.vue
+resources/js/composables:
+useAppearance.ts    useCurrentUrl.ts    useInitials.ts      useTwoFactorAuth.ts
+resources/js/layouts:
+AppLayout.vue  MainLayout.vue auth
+AuthLayout.vue app            settings
+resources/js/layouts/app:
+AppHeaderLayout.vue  AppSidebarLayout.vue
+resources/js/layouts/auth:
+AuthCardLayout.vue   AuthSimpleLayout.vue AuthSplitLayout.vue
+resources/js/layouts/settings:
+Layout.vue
+resources/js/lib:
+utils.ts
+resources/js/pages:
+About.vue           Contact.vue         TaxReturnForm.vue   auth
+Availability.vue    Dashboard.vue       TaxReturnIndex.vue  settings
+Booking.vue         Home.vue            TaxServices.vue
+BookingList.vue     TaxReturnDetail.vue Welcome.vue
+resources/js/pages/auth:
+ConfirmPassword.vue    Register.vue           VerifyEmail.vue
+ForgotPassword.vue     ResetPassword.vue
+Login.vue              TwoFactorChallenge.vue
+resources/js/pages/settings:
+Appearance.vue Password.vue   Profile.vue    TwoFactor.vue
+resources/js/routes:
+api             bookings        profile         tax-information
+appearance      index.ts        register        two-factor
+availability    login           sanctum         user-password
+blog            password        storage         verification
+resources/js/routes/api:
+index.ts
+resources/js/routes/appearance:
+index.ts
+resources/js/routes/availability:
+index.ts
+resources/js/routes/blog:
+index.ts
+resources/js/routes/bookings:
+index.ts
+resources/js/routes/login:
+index.ts
+resources/js/routes/password:
+confirm  index.ts
+resources/js/routes/password/confirm:
+index.ts
+resources/js/routes/profile:
+index.ts
+resources/js/routes/register:
+index.ts
+resources/js/routes/sanctum:
+index.ts
+resources/js/routes/storage:
+index.ts
+resources/js/routes/tax-information:
+index.ts
+resources/js/routes/two-factor:
+index.ts login
+resources/js/routes/two-factor/login:
+index.ts
+resources/js/routes/user-password:
+index.ts
+resources/js/routes/verification:
+index.ts
+resources/js/types:
+auth.ts       globals.d.ts  index.ts      navigation.ts ui.ts
+resources/js/wayfinder:
+index.ts

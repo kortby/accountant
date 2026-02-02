@@ -38,6 +38,12 @@ const hasTestimonials = computed(() => {
 });
 
 import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+
+// Get auth user
+const page = usePage();
+const authUser = page.props.auth?.user;
+const isAdmin = authUser?.role === 'admin';
 </script>
 
 <template>
@@ -104,7 +110,7 @@ import { computed } from 'vue';
                     </CardContent>
                     <CardFooter>
                         <Button as-child variant="ghost" class="group text-amber-700 dark:text-amber-400 hover:text-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/30 p-0 hover:px-2 transition-all">
-                            <Link href="/tax-returns/create">
+                            <Link href="/file-taxes">
                                 Start filing now
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1">
                                     <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.79a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
@@ -114,7 +120,7 @@ import { computed } from 'vue';
                     </CardFooter>
                 </Card>
 
-                <Card class="hover:shadow-md transition-shadow duration-200 dark:border-zinc-800">
+                <Card v-if="isAdmin" class="hover:shadow-md transition-shadow duration-200 dark:border-zinc-800">
                     <CardHeader>
                         <CardTitle class="flex items-center gap-3 text-xl text-amber-600 dark:text-amber-500">
                             <div class="p-2 bg-amber-100 dark:bg-amber-900/20 rounded-lg">
@@ -122,18 +128,46 @@ import { computed } from 'vue';
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                                 </svg>
                             </div>
-                            Schedule Meeting
+                            Manage Bookings
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p class="text-sm text-muted-foreground leading-relaxed">
-                            Book a consultation with your dedicated tax expert. Choose between in-person, video, or phone meetings.
+                            View and manage all client booking requests. Set availability and confirm appointments.
                         </p>
                     </CardContent>
                     <CardFooter>
                         <Button as-child variant="ghost" class="group text-amber-700 dark:text-amber-400 hover:text-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/30 p-0 hover:px-2 transition-all">
-                            <Link href="/appointments/create">
-                                Schedule now
+                            <Link href="/bookings">
+                                Manage bookings
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.79a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
+                                </svg>
+                            </Link>
+                        </Button>
+                    </CardFooter>
+                </Card>
+
+                <Card v-if="isAdmin" class="hover:shadow-md transition-shadow duration-200 dark:border-zinc-800">
+                    <CardHeader>
+                        <CardTitle class="flex items-center gap-3 text-xl text-amber-600 dark:text-amber-500">
+                            <div class="p-2 bg-amber-100 dark:bg-amber-900/20 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            Set Availability
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p class="text-sm text-muted-foreground leading-relaxed">
+                            Configure your working hours and available time slots for client consultations.
+                        </p>
+                    </CardContent>
+                    <CardFooter>
+                        <Button as-child variant="ghost" class="group text-amber-700 dark:text-amber-400 hover:text-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/30 p-0 hover:px-2 transition-all">
+                            <Link href="/availability">
+                                Set availability
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1">
                                     <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.79a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
                                 </svg>
@@ -160,7 +194,7 @@ import { computed } from 'vue';
                     </CardContent>
                     <CardFooter>
                         <Button as-child variant="ghost" class="group text-amber-700 dark:text-amber-400 hover:text-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/30 p-0 hover:px-2 transition-all">
-                            <Link href="/documents/create">
+                            <Link href="/file-taxes">
                                 Upload files
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1">
                                     <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.79a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />

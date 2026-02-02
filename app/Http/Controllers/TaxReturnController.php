@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TaxInformationRequest;
 use App\Models\ClientProfile;
-use App\Models\Dependent;
 use App\Models\TaxReturn;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class TaxReturnController extends Controller
@@ -19,14 +18,27 @@ class TaxReturnController extends Controller
      */
     public function index(Request $request)
     {
-        $query = TaxReturn::where('user_id', auth()->id());
+        $user = auth()->user();
+        $query = TaxReturn::with(['user', 'accountant']);
+
+        // Role-based filtering
+        if ($user->role === 'client') {
+            $query->where('user_id', $user->id);
+        } elseif ($user->role === 'accountant') {
+            // Accountants see their assigned returns or unassigned returns
+            $query->where(function ($q) use ($user) {
+                $q->where('accountant_id', $user->id)
+                    ->orWhereNull('accountant_id');
+            });
+        }
+        // Admins see all returns
 
         // 1. Search Logic (by ID or Tax Year)
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhere('tax_year', 'like', "%{$search}%");
+                    ->orWhere('tax_year', 'like', "%{$search}%");
             });
         }
 
@@ -38,17 +50,48 @@ class TaxReturnController extends Controller
         return Inertia::render('TaxReturnIndex', [
             'taxReturns' => $query->latest()
                 ->paginate(10)
-                ->withQueryString(), // Keeps search params in pagination links
-            'filters' => $request->only(['search', 'status']), // Pass state back to frontend
+                ->withQueryString(),
+            'filters' => $request->only(['search', 'status']),
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource (Client filing their own taxes)
      */
     public function create()
     {
-        //
+        // Clients can only file for themselves
+        return Inertia::render('TaxReturnForm', [
+            'clients' => [],
+            'isAccountantFiling' => false,
+        ]);
+    }
+
+    /**
+     * Show the form for accountant to file on behalf of a client
+     */
+    public function createForClient()
+    {
+        $user = Auth::user();
+
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $clients = User::where('role', 'client')
+            ->select('id', 'first_name', 'last_name', 'email')
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get()
+            ->map(fn ($user) => [
+                'id' => $user->id,
+                'name' => $user->last_name.', '.$user->first_name.' ('.$user->email.')',
+            ]);
+
+        return Inertia::render('TaxReturnForm', [
+            'clients' => $clients,
+            'isAccountantFiling' => true,
+        ]);
     }
 
     /**
@@ -59,9 +102,21 @@ class TaxReturnController extends Controller
         try {
             DB::beginTransaction();
 
-            // 1. Update/Create Profile (Existing logic...)
+            $currentUser = Auth::user();
+            $userId = Auth::id();
+            $accountantId = null;
+            $status = TaxReturn::STATUS_SUBMITTED;
+
+            // If accountant/admin is filing for someone else
+            if (in_array($currentUser->role, ['accountant', 'admin']) && $request->filled('user_id')) {
+                $userId = $request->user_id;
+                $accountantId = $currentUser->id;
+                $status = TaxReturn::STATUS_ASSIGNED; // Auto-assign to the accountant filing
+            }
+
+            // 1. Update/Create Profile
             $profile = ClientProfile::updateOrCreate(
-                ['user_id' => Auth::id()],
+                ['user_id' => $userId],
                 [
                     'social_security_number' => $request->ssn,
                     'date_of_birth' => $request->date_of_birth,
@@ -71,15 +126,18 @@ class TaxReturnController extends Controller
                     'city' => $request->city,
                     'state' => $request->state,
                     'zip_code' => $request->zip_code,
-                    'has_dependents' => !empty($request->dependents),
+                    'has_dependents' => ! empty($request->dependents),
                 ]
             );
 
-            // 2. Create Tax Return (Existing logic...)
+            // 2. Create Tax Return
             $taxReturn = TaxReturn::create([
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
+                'accountant_id' => $accountantId,
                 'tax_year' => $request->tax_year,
-                'status' => 'draft',
+                'status' => $status,
+                'submitted_at' => now(),
+                'assigned_at' => $accountantId ? now() : null,
                 'total_income' => 0,
                 'taxable_income' => 0,
                 'tax_liability' => 0,
@@ -110,7 +168,7 @@ class TaxReturnController extends Controller
             if ($request->hasFile('documents')) {
                 foreach ($request->file('documents') as $file) {
                     $taxReturn->addMedia($file)
-                              ->toMediaCollection('documents');
+                        ->toMediaCollection('documents');
                 }
             }
 
@@ -121,6 +179,7 @@ class TaxReturnController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             // Log the error for debugging: Log::error($e);
             return back()->withErrors(['error' => 'An error occurred. Please try again.']);
         }
@@ -145,7 +204,7 @@ class TaxReturnController extends Controller
         $message = "New tax return request for {$request->tax_year}.\n\n";
         $message .= "Income Types:\n";
         foreach ($request->income_types as $type) {
-            $message .= "- " . $this->getIncomeSourceName($type) . "\n";
+            $message .= '- '.$this->getIncomeSourceName($type)."\n";
         }
 
         if ($request->notes) {
@@ -165,20 +224,29 @@ class TaxReturnController extends Controller
             ->id;
     }
 
-
     /**
      * Display the specified resource.
      */
     public function show(TaxReturn $taxReturn)
     {
-        // 1. Use load() to eager load relationships on the existing model instance
-        // 2. Use 'media' (standard Spatie relationship), not 'Documents'
-        $taxReturn->load(['user', 'deductions', 'incomeSources', 'media']);
+        // Authorization check
+        $user = auth()->user();
+        if ($user->role === 'client' && $taxReturn->user_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        } elseif ($user->role === 'accountant' && $taxReturn->accountant_id !== $user->id && $taxReturn->accountant_id !== null) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $taxReturn->load(['user', 'accountant', 'deductions', 'incomeSources', 'media']);
+
+        // Load client profile based on the tax return's user, not auth user
+        $clientProfile = ClientProfile::where('user_id', $taxReturn->user_id)
+            ->with('dependents')
+            ->first();
 
         return Inertia::render('TaxReturnDetail', [
             'taxReturn' => $taxReturn,
-            // Ensure you load dependents if they aren't already loaded on the user
-            'clientProfile' => auth()->user()->clientProfile()->with('dependents')->first(),
+            'clientProfile' => $clientProfile,
         ]);
     }
 
@@ -187,7 +255,44 @@ class TaxReturnController extends Controller
      */
     public function edit(TaxReturn $taxReturn)
     {
-        //
+        $user = auth()->user();
+
+        // Only accountants and admins can edit
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        // Accountants can only edit their assigned returns
+        if ($user->role === 'accountant' && $taxReturn->accountant_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $taxReturn->load(['user', 'accountant', 'deductions', 'incomeSources', 'media']);
+
+        // Load client profile
+        $clientProfile = ClientProfile::where('user_id', $taxReturn->user_id)
+            ->with('dependents')
+            ->first();
+
+        // Get all accountants for assignment dropdown (admin only)
+        $accountants = [];
+        if ($user->role === 'admin') {
+            $accountants = User::where('role', 'accountant')
+                ->select('id', 'first_name', 'last_name', 'email')
+                ->orderBy('last_name')
+                ->orderBy('first_name')
+                ->get()
+                ->map(fn ($accountant) => [
+                    'id' => $accountant->id,
+                    'name' => $accountant->last_name.', '.$accountant->first_name,
+                ]);
+        }
+
+        return Inertia::render('TaxReturnEdit', [
+            'taxReturn' => $taxReturn,
+            'clientProfile' => $clientProfile,
+            'accountants' => $accountants,
+        ]);
     }
 
     /**
@@ -195,7 +300,130 @@ class TaxReturnController extends Controller
      */
     public function update(Request $request, TaxReturn $taxReturn)
     {
-        //
+        $user = auth()->user();
+
+        // Only accountants and admins can update
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        // Accountants can only update their assigned returns
+        if ($user->role === 'accountant' && $taxReturn->accountant_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $request->validate([
+            'income_sources' => 'nullable|array',
+            'income_sources.*.id' => 'required|exists:income_sources,id',
+            'income_sources.*.amount' => 'required|numeric|min:0',
+            'deductions' => 'nullable|array',
+            'deductions.*.id' => 'nullable|exists:deductions,id',
+            'deductions.*.category' => 'required|string|max:255',
+            'deductions.*.amount' => 'required|numeric|min:0',
+            'deductions.*.description' => 'nullable|string|max:1000',
+            'taxable_income' => 'nullable|numeric|min:0',
+            'tax_liability' => 'nullable|numeric|min:0',
+            'total_credits' => 'nullable|numeric|min:0',
+            'status' => 'nullable|in:'.implode(',', [
+                TaxReturn::STATUS_DRAFT,
+                TaxReturn::STATUS_SUBMITTED,
+                TaxReturn::STATUS_ASSIGNED,
+                TaxReturn::STATUS_UNDER_REVIEW,
+                TaxReturn::STATUS_NEEDS_ACTION,
+                TaxReturn::STATUS_COMPLETED,
+            ]),
+            'accountant_notes' => 'nullable|string|max:5000',
+            'documents' => 'nullable|array',
+            'documents.*' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Update income sources
+            if ($request->has('income_sources')) {
+                foreach ($request->income_sources as $sourceData) {
+                    $taxReturn->incomeSources()
+                        ->where('id', $sourceData['id'])
+                        ->update(['amount' => $sourceData['amount']]);
+                }
+            }
+
+            // Update or create deductions
+            if ($request->has('deductions')) {
+                foreach ($request->deductions as $deductionData) {
+                    if (isset($deductionData['id'])) {
+                        // Update existing deduction
+                        $taxReturn->deductions()
+                            ->where('id', $deductionData['id'])
+                            ->update([
+                                'category' => $deductionData['category'],
+                                'amount' => $deductionData['amount'],
+                                'description' => $deductionData['description'] ?? null,
+                            ]);
+                    } else {
+                        // Create new deduction
+                        $taxReturn->deductions()->create([
+                            'category' => $deductionData['category'],
+                            'amount' => $deductionData['amount'],
+                            'description' => $deductionData['description'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
+            // Recalculate totals
+            $totalIncome = $taxReturn->incomeSources()->sum('amount');
+            $totalDeductions = $taxReturn->deductions()->sum('amount');
+            $taxableIncome = $request->filled('taxable_income') ? $request->taxable_income : max(0, $totalIncome - $totalDeductions);
+            $taxLiability = $request->filled('tax_liability') ? $request->tax_liability : 0;
+            $totalCredits = $request->filled('total_credits') ? $request->total_credits : 0;
+            $finalAmount = $taxLiability - $totalCredits;
+
+            $updates = [
+                'total_income' => $totalIncome,
+                'total_deductions' => $totalDeductions,
+                'taxable_income' => $taxableIncome,
+                'tax_liability' => $taxLiability,
+                'total_credits' => $totalCredits,
+                'amount_due' => $finalAmount > 0 ? $finalAmount : 0,
+                'refund_amount' => $finalAmount < 0 ? abs($finalAmount) : 0,
+            ];
+
+            // Update status if provided
+            if ($request->filled('status')) {
+                $updates['status'] = $request->status;
+
+                if ($request->status === TaxReturn::STATUS_UNDER_REVIEW && ! $taxReturn->reviewed_at) {
+                    $updates['reviewed_at'] = now();
+                } elseif ($request->status === TaxReturn::STATUS_COMPLETED && ! $taxReturn->completed_at) {
+                    $updates['completed_at'] = now();
+                }
+            }
+
+            // Update accountant notes
+            if ($request->filled('accountant_notes')) {
+                $updates['accountant_notes'] = $request->accountant_notes;
+            }
+
+            $taxReturn->update($updates);
+
+            // Handle document uploads
+            if ($request->hasFile('documents')) {
+                foreach ($request->file('documents') as $file) {
+                    $taxReturn->addMedia($file)
+                        ->toMediaCollection('documents');
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('tax-information.show', $taxReturn)
+                ->with('flash.banner', 'Tax return updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->withErrors(['error' => 'Failed to update tax return.']);
+        }
     }
 
     /**
@@ -204,5 +432,168 @@ class TaxReturnController extends Controller
     public function destroy(TaxReturn $taxReturn)
     {
         //
+    }
+
+    /**
+     * Assign tax return to accountant
+     */
+    public function assign(Request $request, TaxReturn $taxReturn)
+    {
+        $user = auth()->user();
+
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        // Accountant can assign to themselves, admin can assign to any accountant
+        $accountantId = $user->role === 'accountant' ? $user->id : $request->accountant_id;
+
+        $taxReturn->update([
+            'accountant_id' => $accountantId,
+            'assigned_at' => now(),
+            'status' => TaxReturn::STATUS_ASSIGNED,
+        ]);
+
+        return redirect()->back()->with('flash.banner', 'Tax return assigned successfully.');
+    }
+
+    /**
+     * Update status of tax return
+     */
+    public function updateStatus(Request $request, TaxReturn $taxReturn)
+    {
+        $user = auth()->user();
+
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $request->validate([
+            'status' => 'required|in:'.implode(',', [
+                TaxReturn::STATUS_DRAFT,
+                TaxReturn::STATUS_SUBMITTED,
+                TaxReturn::STATUS_ASSIGNED,
+                TaxReturn::STATUS_UNDER_REVIEW,
+                TaxReturn::STATUS_NEEDS_ACTION,
+                TaxReturn::STATUS_COMPLETED,
+            ]),
+            'notes' => 'nullable|string|max:5000',
+        ]);
+
+        $updates = ['status' => $request->status];
+
+        if ($request->status === TaxReturn::STATUS_UNDER_REVIEW) {
+            $updates['reviewed_at'] = now();
+        } elseif ($request->status === TaxReturn::STATUS_COMPLETED) {
+            $updates['completed_at'] = now();
+        }
+
+        if ($request->filled('notes')) {
+            $updates['accountant_notes'] = $request->notes;
+        }
+
+        $taxReturn->update($updates);
+
+        return redirect()->back()->with('flash.banner', 'Status updated successfully.');
+    }
+
+    /**
+     * Update income source amounts
+     */
+    public function updateIncome(Request $request, TaxReturn $taxReturn)
+    {
+        $user = auth()->user();
+
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $request->validate([
+            'income_sources' => 'required|array',
+            'income_sources.*.id' => 'required|exists:income_sources,id',
+            'income_sources.*.amount' => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            foreach ($request->income_sources as $sourceData) {
+                $taxReturn->incomeSources()
+                    ->where('id', $sourceData['id'])
+                    ->update(['amount' => $sourceData['amount']]);
+            }
+
+            // Recalculate totals
+            $totalIncome = $taxReturn->incomeSources()->sum('amount');
+            $totalDeductions = $taxReturn->deductions()->sum('amount');
+
+            $taxReturn->update([
+                'total_income' => $totalIncome,
+                'total_deductions' => $totalDeductions,
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('flash.banner', 'Income updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->withErrors(['error' => 'Failed to update income.']);
+        }
+    }
+
+    /**
+     * Add deduction to tax return
+     */
+    public function addDeduction(Request $request, TaxReturn $taxReturn)
+    {
+        $user = auth()->user();
+
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $request->validate([
+            'category' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        $taxReturn->deductions()->create([
+            'category' => $request->category,
+            'amount' => $request->amount,
+            'description' => $request->description,
+        ]);
+
+        // Recalculate totals
+        $totalDeductions = $taxReturn->deductions()->sum('amount');
+        $taxReturn->update(['total_deductions' => $totalDeductions]);
+
+        return redirect()->back()->with('flash.banner', 'Deduction added successfully.');
+    }
+
+    /**
+     * Upload additional documents to tax return
+     */
+    public function uploadDocuments(Request $request, TaxReturn $taxReturn)
+    {
+        $user = auth()->user();
+
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $request->validate([
+            'documents' => 'required|array',
+            'documents.*' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
+        ]);
+
+        if ($request->hasFile('documents')) {
+            foreach ($request->file('documents') as $file) {
+                $taxReturn->addMedia($file)
+                    ->toMediaCollection('documents');
+            }
+        }
+
+        return redirect()->back()->with('flash.banner', 'Documents uploaded successfully.');
     }
 }

@@ -20,7 +20,19 @@ const incomeTypes = [
     { id: 'other', label: 'Other Income' },
 ];
 
+const props = defineProps({
+    clients: {
+        type: Array,
+        default: () => [],
+    },
+    isAccountantFiling: {
+        type: Boolean,
+        default: false,
+    },
+});
+
 const form = useForm({
+    user_id: '',
     tax_year: new Date().getFullYear() - 1,
     // Step 1: Personal
     ssn: '',
@@ -86,7 +98,7 @@ const formatSize = (bytes) => {
 // --- Smart Error Navigation Logic ---
 const fieldsByStep = {
     1: ['ssn', 'date_of_birth', 'occupation', 'marital_status', 'address', 'city', 'state', 'zip_code'],
-    2: ['dependents'], 
+    2: ['dependents'],
     3: ['income_types'],
     4: ['documents'],
 };
@@ -138,7 +150,7 @@ const submit = () => {
     <MainLayout>
         <div class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
             <div class="max-w-4xl mx-auto">
-                
+
                 <div v-if="submissionSuccess" class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center animate-fade-in">
                     <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-6">
                         <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -169,11 +181,39 @@ const submit = () => {
 
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <form @submit.prevent="submit">
-                            
+
                             <div v-show="step === 1" class="p-8 space-y-6 animate-fade-in">
                                 <div class="border-b border-slate-100 pb-4 mb-4">
-                                    <h2 class="text-2xl font-bold text-slate-900">Personal Details</h2>
-                                    <p class="text-slate-500">Let's get your file started with some basics.</p>
+                                    <h2 class="text-2xl font-bold text-slate-900">
+                                        {{ isAccountantFiling ? 'Client Selection & Personal Details' : 'Personal Details' }}
+                                    </h2>
+                                    <p class="text-slate-500">
+                                        {{ isAccountantFiling ? 'Select the client and enter their tax information.' : "Let's get your file started with some basics." }}
+                                    </p>
+                                </div>
+
+                                <!-- Client Selector (Accountant Only) -->
+                                <div v-if="isAccountantFiling" class="space-y-2 bg-orange-50 p-4 rounded-lg border border-orange-200">
+                                    <label class="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-orange-600">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                        </svg>
+                                        Select Client *
+                                    </label>
+                                    <select
+                                        v-model="form.user_id"
+                                        required
+                                        class="w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none"
+                                    >
+                                        <option value="">-- Choose a client --</option>
+                                        <option v-for="client in clients" :key="client.id" :value="client.id">
+                                            {{ client.name }}
+                                        </option>
+                                    </select>
+                                    <span v-if="form.errors.user_id" class="text-xs text-red-600 font-medium">{{ form.errors.user_id }}</span>
+                                    <p class="text-xs text-slate-600 mt-1">
+                                        <strong>Note:</strong> You are filing on behalf of this client. All information will be saved to their profile.
+                                    </p>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -253,7 +293,7 @@ const submit = () => {
                                             </button>
                                         </div>
                                         <h3 class="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Dependent #{{ index + 1 }}</h3>
-                                        
+
                                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div class="space-y-1">
                                                 <label class="text-xs font-medium text-slate-600">First Name</label>
@@ -299,7 +339,7 @@ const submit = () => {
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div v-for="type in incomeTypes" :key="type.id" 
+                                    <div v-for="type in incomeTypes" :key="type.id"
                                         class="relative flex items-start p-4 border rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
                                         :class="form.income_types.includes(type.id) ? 'border-orange-500 bg-orange-50 ring-1 ring-orange-500' : 'border-slate-200'">
                                         <div class="flex h-5 items-center">
@@ -319,7 +359,7 @@ const submit = () => {
                                     <p class="text-slate-500">Please upload pictures or PDFs of your tax forms (W-2s, 1099s, etc).</p>
                                 </div>
 
-                                <div 
+                                <div
                                     @dragover.prevent="dragging = true"
                                     @dragleave.prevent="dragging = false"
                                     @drop.prevent="handleFileDrop"
@@ -333,11 +373,11 @@ const submit = () => {
                                         <div class="mt-4 flex text-sm leading-6 text-slate-600 justify-center">
                                             <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-semibold text-orange-600 focus-within:outline-none hover:text-orange-500">
                                                 <span>Upload a file</span>
-                                                <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple @change="handleFileSelect">
+                                                <input id="file-upload" name="file-upload" type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="sr-only" multiple @change="handleFileSelect">
                                             </label>
                                             <p class="pl-1">or drag and drop</p>
                                         </div>
-                                        <p class="text-xs leading-5 text-slate-500">PNG, JPG, PDF up to 10MB</p>
+                                        <p class="text-xs leading-5 text-slate-500">PDF, JPG, PNG, DOC, DOCX up to 10MB</p>
                                     </div>
                                 </div>
 
@@ -354,28 +394,28 @@ const submit = () => {
                             </div>
 
                             <div class="bg-slate-50 px-8 py-4 flex justify-between items-center border-t border-slate-200">
-                                <button 
-                                    v-if="step > 1" 
-                                    type="button" 
-                                    @click="prevStep" 
+                                <button
+                                    v-if="step > 1"
+                                    type="button"
+                                    @click="prevStep"
                                     class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none"
                                 >
                                     Previous
                                 </button>
                                 <div v-else></div>
 
-                                <button 
-                                    v-if="step < totalSteps" 
-                                    type="button" 
-                                    @click="nextStep" 
+                                <button
+                                    v-if="step < totalSteps"
+                                    type="button"
+                                    @click="nextStep"
                                     class="inline-flex items-center justify-center rounded-md border border-transparent bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800 focus:outline-none"
                                 >
                                     Next Step
                                 </button>
 
-                                <button 
-                                    v-if="step === totalSteps" 
-                                    type="submit" 
+                                <button
+                                    v-if="step === totalSteps"
+                                    type="submit"
                                     :disabled="form.processing"
                                     class="inline-flex items-center justify-center rounded-md border border-transparent bg-orange-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none disabled:opacity-50"
                                 >

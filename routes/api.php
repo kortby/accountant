@@ -14,7 +14,7 @@ use Laravel\Sanctum\Sanctum;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::middleware(EnsureFrontendRequestsAreStateful::class)->group(function () {
+Route::middleware([EnsureFrontendRequestsAreStateful::class, 'auth:sanctum', 'role:admin'])->group(function () {
     Route::resource('availability', App\Http\Controllers\AvailabilityController::class)->only([
         'index', 'store', 'destroy'
     ]);

@@ -9,8 +9,23 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class TaxReturn extends Model implements HasMedia
 {
     use InteractsWithMedia;
+
+    // Valid status values
+    public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_SUBMITTED = 'submitted';
+
+    public const STATUS_ASSIGNED = 'assigned';
+
+    public const STATUS_UNDER_REVIEW = 'under_review';
+
+    public const STATUS_NEEDS_ACTION = 'needs_action';
+
+    public const STATUS_COMPLETED = 'completed';
+
     protected $fillable = [
         'user_id',
+        'accountant_id',
         'tax_year',
         'status',
         'total_income',
@@ -21,11 +36,16 @@ class TaxReturn extends Model implements HasMedia
         'amount_due',
         'refund_amount',
         'submitted_at',
-        'completed_at'
+        'assigned_at',
+        'reviewed_at',
+        'completed_at',
+        'accountant_notes',
     ];
 
     protected $casts = [
         'submitted_at' => 'datetime',
+        'assigned_at' => 'datetime',
+        'reviewed_at' => 'datetime',
         'completed_at' => 'datetime',
         'total_income' => 'decimal:2',
         'taxable_income' => 'decimal:2',
@@ -39,6 +59,11 @@ class TaxReturn extends Model implements HasMedia
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function accountant()
+    {
+        return $this->belongsTo(User::class, 'accountant_id');
     }
 
     public function incomeSources()
@@ -59,6 +84,6 @@ class TaxReturn extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('documents')
-             ->useDisk('public'); // Or 's3' for production
+            ->useDisk('public'); // Or 's3' for production
     }
 }

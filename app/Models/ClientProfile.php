@@ -19,12 +19,13 @@ class ClientProfile extends Model
         'city',
         'state',
         'zip_code',
-        'has_dependents'
+        'has_dependents',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
         'has_dependents' => 'boolean',
+        'social_security_number' => 'encrypted',
     ];
 
     public function user()
@@ -35,5 +36,20 @@ class ClientProfile extends Model
     public function dependents()
     {
         return $this->hasMany(Dependent::class);
+    }
+
+    /**
+     * Get masked SSN (e.g., ***-**-1234)
+     */
+    public function getMaskedSsnAttribute(): string
+    {
+        if (! $this->social_security_number) {
+            return '***-**-****';
+        }
+
+        $ssn = str_replace('-', '', $this->social_security_number);
+        $lastFour = substr($ssn, -4);
+
+        return "***-**-{$lastFour}";
     }
 }

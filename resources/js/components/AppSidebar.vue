@@ -13,11 +13,15 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid, FileUser} from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
+const page = usePage();
+const auth = computed(() => page.props.auth);
+
+const allNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
@@ -32,16 +36,28 @@ const mainNavItems: NavItem[] = [
         title: 'Bookings',
         href: '/bookings',
         icon: BookOpen,
+        roles: ['admin'],
     },
     {
         title: 'Availability Slots',
         href: '/availability',
         icon: Folder,
+        roles: ['admin'],
     },
 ];
 
-const footerNavItems: NavItem[] = [
-];
+// Filter navigation items based on user role
+const userRole = computed(() => auth.value?.user?.role);
+const mainNavItems = computed(() => {
+    return allNavItems.filter(item => {
+        if (!item.roles || item.roles.length === 0) {
+            return true; // No role restriction, show to everyone
+        }
+        return item.roles.includes(userRole.value || '');
+    });
+});
+
+const footerNavItems: NavItem[] = [];
 </script>
 
 <template>

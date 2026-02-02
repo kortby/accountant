@@ -53,13 +53,12 @@ const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
 const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
-const mainNavItems: NavItem[] = [
+const allNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
-
     {
         title: 'Clients files',
         href: '/tax-returns',
@@ -69,16 +68,28 @@ const mainNavItems: NavItem[] = [
         title: 'Bookings',
         href: '/bookings',
         icon: BookOpen,
+        roles: ['admin'],
     },
     {
         title: 'Availability Slots',
         href: '/availability',
         icon: Folder,
+        roles: ['admin'],
     },
 ];
 
-const rightNavItems: NavItem[] = [
-];
+// Filter navigation items based on user role
+const userRole = computed(() => auth.value?.user?.role);
+const mainNavItems = computed(() => {
+    return allNavItems.filter(item => {
+        if (!item.roles || item.roles.length === 0) {
+            return true; // No role restriction, show to everyone
+        }
+        return item.roles.includes(userRole.value || '');
+    });
+});
+
+const rightNavItems: NavItem[] = [];
 </script>
 
 <template>
