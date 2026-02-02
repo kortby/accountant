@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [WebController::class, 'home'])->name('home');
-Route::get('/tax-services', [WebController::class, 'taxService'])->name('taxService');
+Route::get('/services', [WebController::class, 'taxService'])->name('taxService');
 Route::get('/about', [WebController::class, 'aboutUs'])->name('aboutUs');
 Route::get('/contact', [WebController::class, 'contact'])->name('contact');
 Route::post('/message', [WebController::class, 'storeMessage'])->name('store-message');

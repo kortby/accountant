@@ -30,7 +30,7 @@ const toggleMobileMenu = () => {
                             <Link href="/" :class="{'border-orange-500 text-slate-900': $page.url === '/', 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': $page.url !== '/'}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
                                 Home
                             </Link>
-                            <Link href="/tax-services" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/services'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/services')}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
+                            <Link href="/services" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/services'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/services')}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
                                 Services
                             </Link>
                             <Link href="/about" :class="{'border-orange-500 text-slate-900': $page.url.startsWith('/about'), 'border-transparent text-slate-500 hover:border-orange-300 hover:text-orange-600': !$page.url.startsWith('/about')}" class="inline-flex items-center px-1 pt-1 border-b-2 font-medium transition-colors">
@@ -118,9 +118,9 @@ const toggleMobileMenu = () => {
                     <div>
                         <h3 class="text-sm font-semibold text-slate-200 tracking-wider uppercase">Services</h3>
                         <ul class="mt-4 space-y-4">
-                            <li><Link  href="/tax-services" class="text-base hover:text-white">Personal Taxes</Link></li>
-                            <li><Link  href="/tax-services" class="text-base hover:text-white">Business Taxes</Link></li>
-                            <li><Link  href="/tax-services" class="text-base hover:text-white">Audit Defense</Link></li>
+                            <li><Link  href="/services" class="text-base hover:text-white">Personal Taxes</Link></li>
+                            <li><Link  href="/services" class="text-base hover:text-white">Business Taxes</Link></li>
+                            <li><Link  href="/services" class="text-base hover:text-white">Audit Defense</Link></li>
                         </ul>
                     </div>
                     <div>
