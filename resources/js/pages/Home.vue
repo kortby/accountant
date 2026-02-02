@@ -249,7 +249,7 @@
                                 <p class="flex-auto">Skip the office visit. Securely upload your W-2s, 1099s, and
                                     receipts directly from your phone or computer in seconds.</p>
                                 <p class="mt-6">
-                                    <a href="#"
+                                    <a href="/file-taxes"
                                         class="text-sm/6 font-semibold text-orange-400 hover:text-orange-300">Start
                                         uploading <span aria-hidden="true">→</span></a>
                                 </p>
@@ -271,7 +271,7 @@
                                     secure servers to ensure your personal information remains private and protected.
                                 </p>
                                 <p class="mt-6">
-                                    <a href="#"
+                                    <a href="/file-taxes"
                                         class="text-sm/6 font-semibold text-orange-400 hover:text-orange-300">View
                                         security specs <span aria-hidden="true">→</span></a>
                                 </p>
@@ -292,7 +292,7 @@
                                 <p class="flex-auto">Never wonder about the status of your return. Track every step
                                     from document preparation to review and final IRS acceptance via our dashboard.</p>
                                 <p class="mt-6">
-                                    <a href="#"
+                                    <a href="/file-taxes"
                                         class="text-sm/6 font-semibold text-orange-400 hover:text-orange-300">See how
                                         it works <span aria-hidden="true">→</span></a>
                                 </p>

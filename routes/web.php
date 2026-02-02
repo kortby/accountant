@@ -12,6 +12,7 @@ Route::get('/about', [WebController::class, 'aboutUs'])->name('aboutUs');
 Route::get('/contact', [WebController::class, 'contact'])->name('contact');
 Route::post('/message', [WebController::class, 'storeMessage'])->name('store-message');
 
+Route::get('/blog', [BlogPostController::class, 'index'])->name('blog.index');
 Route::get('/blog/{blogPost}', [BlogPostController::class, 'show'])->name('blog.show');
 Route::get('/blog/category/{blogPost}', [BlogPostController::class, 'category'])->name('blog.category');
 
