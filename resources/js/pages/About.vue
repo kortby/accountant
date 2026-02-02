@@ -28,7 +28,7 @@ import MainLayout from '@/Layouts/MainLayout.vue';
                             <figure>
                                 <div class="aspect-w-12 aspect-h-7 lg:aspect-none">
                                     <div class="rounded-lg shadow-lg overflow-hidden bg-slate-200 h-96 flex items-center justify-center text-slate-400">
-                                        <span>Office / Team Image</span> 
+                                        <img src="/img/photos/about.png" alt="Office / Team Image" class=" object-cover object-center" />
                                     </div>
                                 </div>
                             </figure>
