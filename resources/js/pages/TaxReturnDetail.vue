@@ -147,7 +147,7 @@ const getIncomeLabel = (type) => {
                 <div>
                     <h1 class="text-4xl font-bold">{{ taxReturn.tax_year }} - {{ clientProfile?.user?.first_name }} {{ clientProfile?.user?.last_name }}</h1>
                 </div>
-                <Button>
+                <Button  v-if="canViewSSN">
                     <a :href="'/tax-returns/' + taxReturn.id + '/edit'" >
                                                 Edit
                                             </a>
