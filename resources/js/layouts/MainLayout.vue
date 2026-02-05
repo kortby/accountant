@@ -80,7 +80,7 @@ const toggleMobileMenu = () => {
             </div>
         </nav>
 
-        <main class="flex-grow">
+        <main class="flex-row">
             <slot />
         </main>
 

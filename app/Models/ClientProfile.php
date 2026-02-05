@@ -20,12 +20,20 @@ class ClientProfile extends Model
         'state',
         'zip_code',
         'has_dependents',
+        'spouse_first_name',
+        'spouse_middle_name',
+        'spouse_last_name',
+        'spouse_social_security_number',
+        'spouse_date_of_birth',
+        'spouse_occupation',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
+        'spouse_date_of_birth' => 'date',
         'has_dependents' => 'boolean',
         'social_security_number' => 'encrypted',
+        'spouse_social_security_number' => 'encrypted',
     ];
 
     public function user()

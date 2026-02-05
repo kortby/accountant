@@ -11,6 +11,7 @@ const submissionSuccess = ref(false);
 
 const incomeTypes = [
     { id: 'w2', label: 'W-2 (Employment)' },
+    { id: '1099_k', label: '1099-K (Third Party Transactions)' },
     { id: '1099_nec', label: '1099-NEC (Contractor)' },
     { id: '1099_int', label: '1099-INT (Interest)' },
     { id: '1099_div', label: '1099-DIV (Dividends)' },
@@ -32,7 +33,7 @@ const props = defineProps({
 });
 
 const form = useForm({
-    user_id: '',
+    ...(props.isAccountantFiling ? { user_id: '' } : {}),
     tax_year: new Date().getFullYear() - 1,
     // Step 1: Personal
     ssn: '',
@@ -43,6 +44,13 @@ const form = useForm({
     city: '',
     state: '',
     zip_code: '',
+    // Spouse Info (for Married Filing Jointly)
+    spouse_first_name: '',
+    spouse_middle_name: '',
+    spouse_last_name: '',
+    spouse_social_security_number: '',
+    spouse_date_of_birth: '',
+    spouse_occupation: '',
     // Step 2: Dependents
     dependents: [],
     // Step 3: Income
@@ -97,7 +105,7 @@ const formatSize = (bytes) => {
 
 // --- Smart Error Navigation Logic ---
 const fieldsByStep = {
-    1: ['ssn', 'date_of_birth', 'occupation', 'marital_status', 'address', 'city', 'state', 'zip_code'],
+    1: ['ssn', 'date_of_birth', 'occupation', 'marital_status', 'address', 'city', 'state', 'zip_code', 'spouse_first_name', 'spouse_middle_name', 'spouse_last_name', 'spouse_social_security_number', 'spouse_date_of_birth', 'spouse_occupation'],
     2: ['dependents'],
     3: ['income_types'],
     4: ['documents'],
@@ -246,6 +254,51 @@ const submit = () => {
                                             <option value="head_of_household">Head of Household</option>
                                         </select>
                                     </div>
+
+                                    <!-- Spouse Information (Only for Married Filing Jointly) -->
+                                    <div v-if="form.marital_status === 'married_filing_jointly'" class="md:col-span-2 space-y-4 bg-blue-50 p-6 rounded-lg border border-blue-200 animate-fade-in">
+                                        <div class="flex items-center gap-2 mb-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-600">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                                            </svg>
+                                            <h3 class="text-lg font-semibold text-slate-900">Spouse Information</h3>
+                                        </div>
+                                        <p class="text-sm text-slate-600 mb-4">Since you're filing jointly, please provide your spouse's information.</p>
+                                        
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div class="space-y-2">
+                                                <label class="text-sm font-medium text-slate-700">First Name *</label>
+                                                <input v-model="form.spouse_first_name" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                                <span v-if="form.errors.spouse_first_name" class="text-xs text-red-500">{{ form.errors.spouse_first_name }}</span>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-sm font-medium text-slate-700">Middle Name</label>
+                                                <input v-model="form.spouse_middle_name" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-sm font-medium text-slate-700">Last Name *</label>
+                                                <input v-model="form.spouse_last_name" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                                <span v-if="form.errors.spouse_last_name" class="text-xs text-red-500">{{ form.errors.spouse_last_name }}</span>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-sm font-medium text-slate-700">Social Security Number *</label>
+                                                <input v-model="form.spouse_social_security_number" type="text" placeholder="XXX-XX-XXXX" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                                <span v-if="form.errors.spouse_social_security_number" class="text-xs text-red-500">{{ form.errors.spouse_social_security_number }}</span>
+                                                <span v-if="!form.errors.spouse_social_security_number" class="text-xs text-gray-500">eg: XXX-XX-XXXX</span>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-sm font-medium text-slate-700">Date of Birth *</label>
+                                                <input v-model="form.spouse_date_of_birth" type="date" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                                <span v-if="form.errors.spouse_date_of_birth" class="text-xs text-red-500">{{ form.errors.spouse_date_of_birth }}</span>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-sm font-medium text-slate-700">Occupation *</label>
+                                                <input v-model="form.spouse_occupation" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                                <span v-if="form.errors.spouse_occupation" class="text-xs text-red-500">{{ form.errors.spouse_occupation }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="space-y-2 md:col-span-2">
                                         <label class="text-sm font-medium text-slate-700">Address</label>
                                         <input v-model="form.address" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
@@ -254,15 +307,18 @@ const submit = () => {
                                     <div class="space-y-2">
                                         <label class="text-sm font-medium text-slate-700">City</label>
                                         <input v-model="form.city" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"/>
+                                        <span v-if="form.errors.city" class="text-xs text-red-500">{{ form.errors.city }}</span>
                                     </div>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="space-y-2">
                                             <label class="text-sm font-medium text-slate-700">State</label>
                                             <input v-model="form.state" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" maxlength="2" />
+                                            <span v-if="form.errors.state" class="text-xs text-red-500">{{ form.errors.state }}</span>
                                         </div>
                                         <div class="space-y-2">
                                             <label class="text-sm font-medium text-slate-700">Zip Code</label>
                                             <input v-model="form.zip_code" type="number" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                            <span v-if="form.errors.zip_code" class="text-xs text-red-500">{{ form.errors.zip_code }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -315,6 +371,7 @@ const submit = () => {
                                             <div class="space-y-1">
                                                 <label class="text-xs font-medium text-slate-600">Date of Birth</label>
                                                 <input v-model="dependent.date_of_birth" type="date" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+                                                <span v-if="form.errors[`dependents.${index}.date_of_birth`]" class="text-xs text-red-500">Required</span>
                                             </div>
                                             <div class="space-y-1">
                                                 <label class="text-xs font-medium text-slate-600">Relationship</label>
@@ -326,6 +383,7 @@ const submit = () => {
                                                     <option value="parent">Parent</option>
                                                     <option value="other">Other</option>
                                                 </select>
+                                                <span v-if="form.errors[`dependents.${index}.relationship`]" class="text-xs text-red-500">Required</span>
                                             </div>
                                         </div>
                                     </div>

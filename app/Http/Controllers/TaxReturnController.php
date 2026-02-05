@@ -115,19 +115,34 @@ class TaxReturnController extends Controller
             }
 
             // 1. Update/Create Profile
+            $profileData = [
+                'user_id' => $userId,
+                'social_security_number' => $request->ssn,
+                'date_of_birth' => $request->date_of_birth,
+                'occupation' => $request->occupation,
+                'marital_status' => $request->marital_status,
+                'address' => $request->address,
+                'city' => $request->city,
+                'state' => $request->state,
+                'zip_code' => $request->zip_code,
+                'has_dependents' => ! empty($request->dependents),
+            ];
+
+            // Add spouse data if married filing jointly
+            if ($request->marital_status === 'married_filing_jointly') {
+                $profileData = array_merge($profileData, [
+                    'spouse_first_name' => $request->spouse_first_name,
+                    'spouse_middle_name' => $request->spouse_middle_name,
+                    'spouse_last_name' => $request->spouse_last_name,
+                    'spouse_social_security_number' => $request->spouse_social_security_number,
+                    'spouse_date_of_birth' => $request->spouse_date_of_birth,
+                    'spouse_occupation' => $request->spouse_occupation,
+                ]);
+            }
+
             $profile = ClientProfile::updateOrCreate(
                 ['user_id' => $userId],
-                [
-                    'social_security_number' => $request->ssn,
-                    'date_of_birth' => $request->date_of_birth,
-                    'occupation' => $request->occupation,
-                    'marital_status' => $request->marital_status,
-                    'address' => $request->address,
-                    'city' => $request->city,
-                    'state' => $request->state,
-                    'zip_code' => $request->zip_code,
-                    'has_dependents' => ! empty($request->dependents),
-                ]
+                $profileData
             );
 
             // 2. Create Tax Return
@@ -189,6 +204,7 @@ class TaxReturnController extends Controller
     {
         return match ($type) {
             'w2' => 'Employment Income',
+            '1099_k' => 'Third Party Transaction Income',
             '1099_nec' => 'Contractor Income',
             '1099_int' => 'Interest Income',
             '1099_div' => 'Investment Income',
