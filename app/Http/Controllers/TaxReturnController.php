@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class TaxReturnController extends Controller
@@ -161,6 +162,10 @@ class TaxReturnController extends Controller
                 'amount_due' => 0,
                 'refund_amount' => 0,
             ]);
+
+            Mail::to($profile->user->email)->send(new \App\Mail\TaxReturnSubmitted($taxReturn));
+
+            Mail::to('boutout.ea@gmail.com')->send(new \App\Mail\NewTaxReturnNotification($taxReturn, $this->generateInitialMessage($request)));
 
             // 3. Handle Dependents (Existing logic...)
             if ($request->has('dependents')) {
