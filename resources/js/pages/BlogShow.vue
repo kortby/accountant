@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import MainLayout from '@/Layouts/MainLayout.vue';
+import MainLayout from '@/layouts/MainLayout.vue';
 import { computed } from 'vue';
 
 const props = defineProps({

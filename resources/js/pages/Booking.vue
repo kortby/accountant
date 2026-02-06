@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import MainLayout from '@/Layouts/MainLayout.vue';
+import MainLayout from '@/layouts/MainLayout.vue';
 import axios from 'axios';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircleIcon, CheckCircle2Icon } from 'lucide-vue-next';

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useForm, Head, Link } from '@inertiajs/vue3';
-import MainLayout from '@/Layouts/MainLayout.vue';
+import MainLayout from '@/layouts/MainLayout.vue';
 
 // --- State ---
 const step = ref(1);

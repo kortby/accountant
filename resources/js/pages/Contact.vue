@@ -1,6 +1,6 @@
 <script setup>
 import { Head, useForm, usePage } from '@inertiajs/vue3';
-import MainLayout from '@/Layouts/MainLayout.vue';
+import MainLayout from '@/layouts/MainLayout.vue';
 import { computed } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
