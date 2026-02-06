@@ -3,7 +3,7 @@
 
 Dear {{ $booking->client_name }},
 
-Thank you for submitting a booking request with Parker's Excellence Group.  
+Thank you for submitting a booking request with TaxesAccountant.  
 We have successfully received your request for the following session:
 
 ## Requested Session Summary
@@ -28,5 +28,5 @@ You will receive another email once the status is updated to **Confirmed** or **
 If you have any questions in the meantime, feel free to **reply to this email**.
 
 Best regards,  
-**The Parker's Excellence Group Team**
+**TaxesAccountant**
 @endcomponent

@@ -136,13 +136,8 @@ class BookingController extends Controller
             'location_type' => $request->input('location_type'),
             'status' => 'pending', // Requires coach confirmation
         ]);
-
         Mail::to($booking->client_email)->send(new BookingConfirmation($booking));
         Mail::to('boutout.ea@gmail.com')->send(new BookingNotification($booking));
-
-        // 4. Dispatch Notifications (Coach/Client)
-        // Mail::to($booking->client_email)->send(new BookingConfirmation($booking));
-        // Mail::to('charmingmrsp@gmail.com')->send(new BookingNotification($booking));
 
         // 5. Return success response
         return response()->json([

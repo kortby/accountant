@@ -24,5 +24,5 @@ Review Booking in Dashboard
 @endcomponent
 
 Thank you,  
-**Parker's Excellence Group System**
+**TaxesAccountant**
 @endcomponent
