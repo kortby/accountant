@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\TaxReturnController;
 use App\Http\Controllers\TestimonialController;
@@ -12,6 +13,10 @@ Route::get('/services', [WebController::class, 'taxService'])->name('taxService'
 Route::get('/about', [WebController::class, 'aboutUs'])->name('aboutUs');
 Route::get('/contact', [WebController::class, 'contact'])->name('contact');
 Route::post('/message', [WebController::class, 'storeMessage'])->name('store-message');
+
+// Google OAuth routes
+Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
 Route::get('/blog', [BlogPostController::class, 'index'])->name('blog.index');
 Route::get('/blog/{blogPost}', [BlogPostController::class, 'show'])->name('blog.show');

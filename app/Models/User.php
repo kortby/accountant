@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +25,8 @@ class User extends Authenticatable
         'phone',
         'email',
         'password',
+        'google_id',
+        'email_verified_at',
     ];
 
     /**
@@ -32,7 +34,7 @@ class User extends Authenticatable
      */
     public function getNameAttribute(): string
     {
-        return trim((string) ($this->first_name . ' ' . ($this->last_name ?? '')));
+        return trim((string) ($this->first_name.' '.($this->last_name ?? '')));
     }
 
     /**
