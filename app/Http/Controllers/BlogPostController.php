@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BlogPost;
-use Illuminate\Http\Request;
-
 use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\BlogTag;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class BlogPostController extends Controller
 {
@@ -54,19 +52,19 @@ class BlogPostController extends Controller
                 'title' => $post->title,
                 'slug' => $post->slug,
                 'excerpt' => $post->excerpt,
-                'featured_image' => Storage::url($post->featured_image) == '/storage/' ? '/img/photos/' . rand(1, 3) . '.jpg' : Storage::url($post->featured_image) ?? '/img/photos/' . rand(1, 3) . '.jpg',
+                'featured_image' => Storage::url($post->featured_image) == '/storage/' ? '/img/photos/'.rand(1, 3).'.jpg' : Storage::url($post->featured_image) ?? '/img/photos/'.rand(1, 3).'.jpg',
                 'published_at' => $post->published_at->format('M d, Y'),
-                'reading_time' => $post->reading_time . ' min read',
+                'reading_time' => $post->reading_time.' min read',
                 'category' => [
                     'name' => $post->category->name,
                     'slug' => $post->category->slug,
                 ],
                 'author' => [
-                    'name' => $post->author->first_name . ' ' . $post->author->last_name,
+                    'name' => $post->author->first_name.' '.$post->author->last_name,
                     'role' => $post->author->role === 'accountant' ? 'Tax Expert' : 'Enrolled Agent & Tax Expert',
-                    'avatar' => $post->author->profile_image ?? '/img/photos/' . rand(1, 3) . '.jpg',
+                    'avatar' => $post->author->profile_image ?? '/img/photos/'.rand(1, 3).'.jpg',
                 ],
-                'tags' => $post->tags->map(fn($tag) => [
+                'tags' => $post->tags->map(fn ($tag) => [
                     'name' => $tag->name,
                     'slug' => $tag->slug,
                 ]),
@@ -97,7 +95,7 @@ class BlogPostController extends Controller
                     'title' => $post->title,
                     'href' => route('blog.show', $post->slug),
                     'description' => $post->excerpt,
-                    'imageUrl' => Storage::url($post->featured_image) == '/storage/' ? '/img/photos/' . rand(1, 3) . '.jpg' : Storage::url($post->featured_image) ?? '/img/photos/' . rand(1, 3) . '.jpg',
+                    'imageUrl' => Storage::url($post->featured_image) == '/storage/' ? '/img/photos/'.rand(1, 3).'.jpg' : Storage::url($post->featured_image) ?? '/img/photos/'.rand(1, 3).'.jpg',
                     'date' => $post->published_at->format('M d, Y'),
                     'datetime' => $post->published_at->toISOString(),
                     'category' => [
@@ -105,9 +103,9 @@ class BlogPostController extends Controller
                         'href' => route('blog.category', $post->category->slug),
                     ],
                     'author' => [
-                        'name' => $post->author->first_name . ' ' . $post->author->last_name,
+                        'name' => $post->author->first_name.' '.$post->author->last_name,
                         'role' => $post->author->role === 'accountant' ? 'Enrolled Agent & Tax Expert' : 'Enrolled Agent & Tax Expert',
-                        'imageUrl' => $post->author->profile_image ?? '/img/photos/' . rand(1, 3) . '.jpg',
+                        'imageUrl' => $post->author->profile_image ?? '/img/photos/'.rand(1, 3).'.jpg',
                     ],
                 ];
             });
@@ -129,33 +127,32 @@ class BlogPostController extends Controller
                 'id' => $blogPost->id,
                 'title' => $blogPost->title,
                 'content' => $blogPost->content,
-                'featured_image' => Storage::url($blogPost->featured_image) == '/storage/' ? '/img/photos/' . rand(1, 3) . '.jpg' : Storage::url($blogPost->featured_image),
+                'featured_image' => Storage::url($blogPost->featured_image) == '/storage/' ? '/img/photos/'.rand(1, 3).'.jpg' : Storage::url($blogPost->featured_image),
                 'published_at' => $blogPost->published_at->format('M d, Y'),
-                'reading_time' => $blogPost->reading_time . ' min read',
+                'reading_time' => $blogPost->reading_time.' min read',
                 'view_count' => $blogPost->view_count,
                 'category' => [
                     'name' => $blogPost->category->name,
                     'slug' => $blogPost->category->slug,
                 ],
                 'author' => [
-                    'name' => $blogPost->author->first_name . ' ' . $blogPost->author->last_name,
+                    'name' => $blogPost->author->first_name.' '.$blogPost->author->last_name,
                     'role' => $blogPost->author->role === 'accountant' ? 'Tax Expert' : 'Enrolled Agent & Tax Expert',
-                    'avatar' => $blogPost->author->profile_image ?? '/img/photos/' . rand(1, 3) . '.jpg',
+                    'avatar' => $blogPost->author->profile_image ?? '/img/photos/'.rand(1, 3).'.jpg',
                     'bio' => $blogPost->author->bio ?? null,
                 ],
-                'tags' => $blogPost->tags->map(fn($tag) => [
+                'tags' => $blogPost->tags->map(fn ($tag) => [
                     'name' => $tag->name,
                     'slug' => $tag->slug,
                 ]),
-                'related_posts' => $blogPost->relatedPosts->map(fn($related) => [
+                'related_posts' => $blogPost->relatedPosts->map(fn ($related) => [
                     'title' => $related->title,
                     'slug' => $related->slug,
                     'excerpt' => $related->excerpt,
-                    'featured_image' => $related->featured_image ?? '/img/photos/' . rand(1, 3) . '.jpg',
+                    'featured_image' => $related->featured_image ?? '/img/photos/'.rand(1, 3).'.jpg',
                 ]),
             ],
         ];
-
 
         return Inertia::render('BlogShow', $data);
     }
@@ -199,6 +196,50 @@ class BlogPostController extends Controller
     }
 
     /**
+     * Display admin listing of all blog posts (including drafts).
+     */
+    public function manage(Request $request): \Inertia\Response
+    {
+        $query = BlogPost::with(['category', 'author'])
+            ->latest('updated_at');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%");
+            });
+        }
+
+        $posts = $query->paginate(15)->through(function ($post) {
+            return [
+                'id' => $post->id,
+                'title' => $post->title,
+                'slug' => $post->slug,
+                'excerpt' => $post->excerpt,
+                'status' => $post->status,
+                'published_at' => $post->published_at?->format('M d, Y'),
+                'updated_at' => $post->updated_at->format('M d, Y'),
+                'category' => $post->category ? [
+                    'name' => $post->category->name,
+                ] : null,
+                'author' => [
+                    'name' => $post->author->first_name.' '.$post->author->last_name,
+                ],
+            ];
+        });
+
+        return Inertia::render('Blog/Manage', [
+            'posts' => $posts,
+            'filters' => $request->only(['search', 'status']),
+        ]);
+    }
+
+    /**
      * Show blog post creation form
      */
     public function create()
@@ -228,7 +269,7 @@ class BlogPostController extends Controller
         $post = new BlogPost($validated);
         $post->user_id = Auth::id();
         $post->slug = Str::slug($request->title);
-        
+
         // Calculate reading time (average 200 words per minute)
         $wordCount = str_word_count(strip_tags($request->content));
         $post->reading_time = max(1, ceil($wordCount / 200));
@@ -237,8 +278,8 @@ class BlogPostController extends Controller
             $path = $request->file('featured_image')->store('blog', 'public');
             $post->featured_image = $path;
         }
-        
-        if ($validated['status'] === 'published' && !$post->published_at) {
+
+        if ($validated['status'] === 'published' && ! $post->published_at) {
             $post->published_at = now();
         }
 
@@ -266,7 +307,7 @@ class BlogPostController extends Controller
                 'content' => $post->content,
                 'excerpt' => $post->excerpt,
                 'category_id' => $post->category_id,
-                'featured_image' => Storage::url($post->featured_image) == '/storage/' ? '/img/photos/' . rand(1, 3) . '.jpg' : Storage::url($post->featured_image),
+                'featured_image' => Storage::url($post->featured_image) == '/storage/' ? '/img/photos/'.rand(1, 3).'.jpg' : Storage::url($post->featured_image),
                 'status' => $post->status,
                 'tags' => $post->tags->pluck('id'),
             ],

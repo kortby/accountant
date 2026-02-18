@@ -44,6 +44,12 @@ const allNavItems: NavItem[] = [
         icon: Folder,
         roles: ['admin'],
     },
+    {
+        title: 'Manage Blogs',
+        href: '/blogs',
+        icon: BookOpen,
+        roles: ['admin'],
+    },
 ];
 
 // Filter navigation items based on user role

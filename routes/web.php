@@ -19,6 +19,7 @@ Route::get('/blog/category/{blogPost}', [BlogPostController::class, 'category'])
 
 // Blog management routes (authenticated)
 Route::middleware(['auth', 'verified', 'role:accountant,admin'])->group(function () {
+    Route::get('/blogs', [BlogPostController::class, 'manage'])->name('blogs.index');
     Route::get('/blogs/create', [BlogPostController::class, 'create'])->name('blogs.create');
     Route::post('/blogs', [BlogPostController::class, 'store'])->name('blogs.store');
     Route::get('/blogs/{post}/edit', [BlogPostController::class, 'edit'])->name('blogs.edit');
