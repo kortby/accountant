@@ -231,7 +231,7 @@
                                     <TableCell class="font-medium">
                                         <div>{{ tax . tax_year }} Return</div>
                                         <div class="text-xs text-gray-500 dark:text-gray-400 font-normal">
-                                            #{{ tax . id }}</div>
+                                            #{{ tax . id }} &mdash; {{ tax.user?.first_name }} {{ tax.user?.last_name }}</div>
                                     </TableCell>
                                     <TableCell>
                                         <span

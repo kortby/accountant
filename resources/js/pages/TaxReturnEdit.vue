@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import {
     Card,
     CardContent,
@@ -38,7 +39,10 @@ const form = useForm({
         id: source.id,
         type: source.type,
         source_name: source.source_name,
+        employer_name: source.employer_name || '',
         amount: source.amount || 0,
+        ai_extracted: source.ai_extracted || false,
+        ai_confidence: source.ai_confidence || 0,
     })),
     deductions: props.taxReturn.deductions.map(deduction => ({
         id: deduction.id,
@@ -130,6 +134,13 @@ const removeDocument = (index) => {
     }
 };
 
+const removeExistingDocument = (mediaId) => {
+    if (!confirm('Are you sure you want to remove this document?')) return;
+    router.delete(`/tax-returns/${props.taxReturn.id}/documents/${mediaId}`, {
+        preserveScroll: true,
+    });
+};
+
 const formatSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -207,8 +218,15 @@ const submit = () => {
                              class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex-1">
-                                    <Label class="text-gray-700 dark:text-gray-300 font-semibold">{{ getIncomeTypeLabel(source.type) }}</Label>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ source.source_name }}</p>
+                                    <div class="flex items-center gap-2">
+                                        <Label class="text-gray-700 dark:text-gray-300 font-semibold">{{ getIncomeTypeLabel(source.type) }}</Label>
+                                        <Badge v-if="source.ai_extracted" variant="outline" class="text-xs border-orange-300 text-orange-600 dark:border-orange-600 dark:text-orange-400">
+                                            AI {{ Math.round((source.ai_confidence || 0) * 100) }}%
+                                        </Badge>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ source.employer_name || source.source_name }}
+                                    </p>
                                 </div>
                                 <div class="w-48">
                                     <Label for="`income-${source.id}`" class="text-gray-700 dark:text-gray-300">Amount</Label>
@@ -519,8 +537,11 @@ const submit = () => {
                             </div>
                         </div>
 
-                        <!-- Existing Documents -->
-                        <div v-if="taxReturn.media && taxReturn.media.length > 0" class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    </CardContent>
+
+                    <!-- Existing Documents (always visible) -->
+                    <CardContent v-if="taxReturn.media && taxReturn.media.length > 0" class="pt-0">
+                        <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
                             <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Existing documents:</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div
@@ -528,15 +549,29 @@ const submit = () => {
                                     :key="file.id"
                                     class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
                                 >
-                                    <div class="h-8 w-8 flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded flex items-center justify-center">
+                                    <a :href="file.original_url" target="_blank" class="flex items-center flex-1 overflow-hidden hover:opacity-80 transition-opacity">
+                                        <div class="h-8 w-8 flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded flex items-center justify-center">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3 flex-1 overflow-hidden">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ file.file_name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ file.mime_type }}</p>
+                                        </div>
+                                    </a>
+                                    <Button
+                                        @click="removeExistingDocument(file.id)"
+                                        type="button"
+                                        size="sm"
+                                        variant="ghost"
+                                        class="ml-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/30"
+                                        title="Remove document"
+                                    >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
-                                    </div>
-                                    <div class="ml-3 flex-1 overflow-hidden">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ file.file_name }}</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ file.mime_type }}</p>
-                                    </div>
+                                    </Button>
                                 </div>
                             </div>
                         </div>

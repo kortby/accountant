@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tax-returns', [TaxReturnController::class, 'index'])->name('tax-information.index');
 
     Route::get('/tax-returns/{taxReturn}', [TaxReturnController::class, 'show'])->name('tax-information.show');
+    Route::get('/tax-returns/{taxReturn}/ai-status', [TaxReturnController::class, 'aiStatus'])->name('tax-returns.ai-status');
 
     Route::post('/store-tax', [TaxReturnController::class, 'store'])->name('tax-information.store');
 
@@ -62,10 +63,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/tax-returns/{taxReturn}/edit', [TaxReturnController::class, 'edit'])->name('tax-returns.edit');
         Route::patch('/tax-returns/{taxReturn}', [TaxReturnController::class, 'update'])->name('tax-returns.update');
         Route::post('/tax-returns/{taxReturn}/assign', [TaxReturnController::class, 'assign'])->name('tax-returns.assign');
+        Route::post('/tax-returns/{taxReturn}/cancel-ai', [TaxReturnController::class, 'cancelAi'])->name('tax-returns.cancel-ai');
         Route::patch('/tax-returns/{taxReturn}/status', [TaxReturnController::class, 'updateStatus'])->name('tax-returns.update-status');
         Route::patch('/tax-returns/{taxReturn}/income', [TaxReturnController::class, 'updateIncome'])->name('tax-returns.update-income');
         Route::post('/tax-returns/{taxReturn}/deductions', [TaxReturnController::class, 'addDeduction'])->name('tax-returns.add-deduction');
         Route::post('/tax-returns/{taxReturn}/upload-documents', [TaxReturnController::class, 'uploadDocuments'])->name('tax-returns.upload-documents');
+        Route::delete('/tax-returns/{taxReturn}/documents/{media}', [TaxReturnController::class, 'deleteDocument'])->name('tax-returns.delete-document');
     });
 
     // Admin-only routes

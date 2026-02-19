@@ -27,6 +27,7 @@ class User extends Authenticatable
         'password',
         'google_id',
         'email_verified_at',
+        'ai_enabled',
     ];
 
     /**
@@ -60,6 +61,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'ai_enabled' => 'boolean',
         ];
     }
 

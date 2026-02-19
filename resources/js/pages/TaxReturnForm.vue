@@ -8,6 +8,7 @@ const step = ref(1);
 const totalSteps = 4;
 const dragging = ref(false);
 const submissionSuccess = ref(false);
+const fileErrors = ref([]);
 
 const incomeTypes = [
     { id: 'w2', label: 'W-2 (Employment)' },
@@ -87,8 +88,33 @@ const handleFileSelect = (e) => {
     addFiles(files);
 };
 
+const ALLOWED_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 const addFiles = (files) => {
-    form.documents = [...form.documents, ...files];
+    fileErrors.value = [];
+    const valid = [];
+    const errors = [];
+
+    for (const file of files) {
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+            errors.push(`"${file.name}" — unsupported format. Allowed: PDF, JPG, PNG, DOC, DOCX.`);
+            continue;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+            errors.push(`"${file.name}" — exceeds 10MB limit (${formatSize(file.size)}).`);
+            continue;
+        }
+        valid.push(file);
+    }
+
+    if (errors.length > 0) {
+        fileErrors.value = errors;
+    }
+    if (valid.length > 0) {
+        form.documents = [...form.documents, ...valid];
+    }
 };
 
 const removeFile = (index) => {
@@ -436,6 +462,20 @@ const submit = () => {
                                             <p class="pl-1">or drag and drop</p>
                                         </div>
                                         <p class="text-xs leading-5 text-slate-500">PDF, JPG, PNG, DOC, DOCX up to 10MB</p>
+                                    </div>
+                                </div>
+
+                                <div v-if="fileErrors.length > 0" class="mt-3 rounded-md bg-red-50 border border-red-200 p-3">
+                                    <div class="flex items-start gap-2">
+                                        <svg class="h-5 w-5 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-sm font-medium text-red-800">Some files were not added:</p>
+                                            <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+                                                <li v-for="(error, i) in fileErrors" :key="i">{{ error }}</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 

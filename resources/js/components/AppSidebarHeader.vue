@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useAppearance } from '@/composables/useAppearance';
+import { Moon, Sun } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 
 withDefaults(
@@ -11,6 +14,12 @@ withDefaults(
         breadcrumbs: () => [],
     },
 );
+
+const { resolvedAppearance, updateAppearance } = useAppearance();
+
+function toggleTheme() {
+    updateAppearance(resolvedAppearance.value === 'dark' ? 'light' : 'dark');
+}
 </script>
 
 <template>
@@ -22,6 +31,12 @@ withDefaults(
             <template v-if="breadcrumbs && breadcrumbs.length > 0">
                 <Breadcrumbs :breadcrumbs="breadcrumbs" />
             </template>
+        </div>
+        <div class="ml-auto flex items-center">
+            <Button variant="ghost" size="icon" @click="toggleTheme" class="h-9 w-9 rounded-md" title="Toggle dark mode">
+                <Sun v-if="resolvedAppearance === 'dark'" class="h-4 w-4" />
+                <Moon v-else class="h-4 w-4" />
+            </Button>
         </div>
     </header>
 </template>

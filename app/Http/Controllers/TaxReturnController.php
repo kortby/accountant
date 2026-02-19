@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TaxInformationRequest;
+use App\Jobs\ProcessTaxDocuments;
 use App\Models\ClientProfile;
 use App\Models\TaxReturn;
 use App\Models\User;
@@ -194,6 +195,18 @@ class TaxReturnController extends Controller
 
             DB::commit();
 
+            // Dispatch AI document processing job if documents were uploaded and AI is enabled
+            $aiEnabled = $request->user()->ai_enabled ?? true;
+            if ($aiEnabled && $request->hasFile('documents') && $taxReturn->getMedia('documents')->isNotEmpty()) {
+                $taxReturn->update(['ai_processing_status' => 'pending']);
+
+                if (app()->environment('local', 'testing')) {
+                    ProcessTaxDocuments::dispatchSync($taxReturn->id);
+                } else {
+                    ProcessTaxDocuments::dispatch($taxReturn->id);
+                }
+            }
+
             return redirect()->route('dashboard')
                 ->with('flash.banner', 'Tax information and documents submitted successfully.');
 
@@ -258,7 +271,7 @@ class TaxReturnController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $taxReturn->load(['user', 'accountant', 'deductions', 'incomeSources', 'media']);
+        $taxReturn->load(['user', 'accountant', 'deductions', 'incomeSources', 'documentExtractions', 'media']);
 
         // Load client profile based on the tax return's user, not auth user
         $clientProfile = ClientProfile::where('user_id', $taxReturn->user_id)
@@ -288,7 +301,7 @@ class TaxReturnController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $taxReturn->load(['user', 'accountant', 'deductions', 'incomeSources', 'media']);
+        $taxReturn->load(['user', 'accountant', 'deductions', 'incomeSources', 'documentExtractions', 'media']);
 
         // Load client profile
         $clientProfile = ClientProfile::where('user_id', $taxReturn->user_id)
@@ -445,6 +458,56 @@ class TaxReturnController extends Controller
 
             return back()->withErrors(['error' => 'Failed to update tax return.']);
         }
+    }
+
+    /**
+     * Get AI processing status for polling.
+     */
+    public function aiStatus(TaxReturn $taxReturn): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+        if ($user->role === 'client' && $taxReturn->user_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $errors = $taxReturn->documentExtractions()
+            ->where('status', 'failed')
+            ->whereNotNull('error_message')
+            ->pluck('error_message')
+            ->toArray();
+
+        return response()->json([
+            'ai_processing_status' => $taxReturn->ai_processing_status ?? 'none',
+            'ai_processed_at' => $taxReturn->ai_processed_at,
+            'errors' => $errors,
+        ]);
+    }
+
+    /**
+     * Cancel AI processing for a tax return.
+     */
+    public function cancelAi(TaxReturn $taxReturn): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        if (in_array($taxReturn->ai_processing_status, ['pending', 'processing'])) {
+            $taxReturn->update(['ai_processing_status' => 'cancelled']);
+
+            // Mark any pending/processing extractions as cancelled
+            $taxReturn->documentExtractions()
+                ->whereIn('status', ['pending', 'processing'])
+                ->update([
+                    'status' => 'failed',
+                    'error_message' => 'Cancelled by accountant',
+                    'processed_at' => now(),
+                ]);
+        }
+
+        return response()->json(['ai_processing_status' => $taxReturn->ai_processing_status]);
     }
 
     /**
@@ -616,5 +679,27 @@ class TaxReturnController extends Controller
         }
 
         return redirect()->back()->with('flash.banner', 'Documents uploaded successfully.');
+    }
+
+    /**
+     * Delete a document from a tax return
+     */
+    public function deleteDocument(TaxReturn $taxReturn, int $mediaId): \Illuminate\Http\RedirectResponse
+    {
+        $user = auth()->user();
+
+        if (! in_array($user->role, ['accountant', 'admin'])) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $media = $taxReturn->media()->where('id', $mediaId)->first();
+
+        if (! $media) {
+            abort(404, 'Document not found.');
+        }
+
+        $media->delete();
+
+        return redirect()->back()->with('flash.banner', 'Document removed successfully.');
     }
 }

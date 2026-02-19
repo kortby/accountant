@@ -40,6 +40,9 @@ class TaxReturn extends Model implements HasMedia
         'reviewed_at',
         'completed_at',
         'accountant_notes',
+        'ai_processing_status',
+        'ai_processed_at',
+        'federal_tax_withheld',
     ];
 
     protected $casts = [
@@ -47,6 +50,7 @@ class TaxReturn extends Model implements HasMedia
         'assigned_at' => 'datetime',
         'reviewed_at' => 'datetime',
         'completed_at' => 'datetime',
+        'ai_processed_at' => 'datetime',
         'total_income' => 'decimal:2',
         'taxable_income' => 'decimal:2',
         'tax_liability' => 'decimal:2',
@@ -54,6 +58,7 @@ class TaxReturn extends Model implements HasMedia
         'total_credits' => 'decimal:2',
         'amount_due' => 'decimal:2',
         'refund_amount' => 'decimal:2',
+        'federal_tax_withheld' => 'decimal:2',
     ];
 
     public function user()
@@ -79,6 +84,11 @@ class TaxReturn extends Model implements HasMedia
     public function messages()
     {
         return $this->hasMany(Message::class);
+    }
+
+    public function documentExtractions()
+    {
+        return $this->hasMany(DocumentExtraction::class);
     }
 
     public function registerMediaCollections(): void
