@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BlogPostController;
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\TaxReturnController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\WebController;
@@ -13,6 +14,11 @@ Route::get('/services', [WebController::class, 'taxService'])->name('taxService'
 Route::get('/about', [WebController::class, 'aboutUs'])->name('aboutUs');
 Route::get('/contact', [WebController::class, 'contact'])->name('contact');
 Route::post('/message', [WebController::class, 'storeMessage'])->name('store-message');
+
+// Chatbot API
+Route::post('/chatbot', [ChatbotController::class, 'chat'])
+    ->middleware('throttle:chatbot')
+    ->name('chatbot.chat');
 
 // Google OAuth routes
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('auth.google.redirect');

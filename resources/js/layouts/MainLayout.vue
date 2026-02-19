@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
+import ChatbotWidget from '@/components/ChatbotWidget.vue';
 
 const props = defineProps({
     canLogin: Boolean,
@@ -289,6 +290,9 @@ const navLinks = [
                 </div>
             </div>
         </footer>
+
+        <!-- Chatbot Widget -->
+        <ChatbotWidget />
 
         <!-- Mobile sticky CTA bar -->
         <div class="fixed bottom-0 inset-x-0 z-50 lg:hidden bg-white border-t border-slate-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)] safe-area-bottom">
